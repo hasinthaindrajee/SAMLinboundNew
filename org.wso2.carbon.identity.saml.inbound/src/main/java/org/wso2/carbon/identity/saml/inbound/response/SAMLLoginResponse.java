@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
+import org.wso2.carbon.identity.gateway.api.IdentityResponse;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.model.SAMLSSOServiceProviderDO;
@@ -148,6 +149,11 @@ public class SAMLLoginResponse extends SAMLResponse {
             }
 
             return stat;
+        }
+
+        @Override
+        public IdentityResponse build() {
+            return new SAMLLoginResponse(this);
         }
     }
 }

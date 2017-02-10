@@ -59,7 +59,7 @@ public class KeyStoreManager {
         try {
             return keyStore.getKey(alias, keystorePassword.toCharArray());
         } catch (Exception e) {
-            String msg = "Error has encounted while loading the key for the given alias " + alias;
+            String msg = "Error has encountered while loading the key for the given alias " + alias;
             throw new IdentityException(msg);
         }
     }

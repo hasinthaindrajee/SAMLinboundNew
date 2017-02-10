@@ -14,6 +14,7 @@ public class SAMLConfigurations {
         configuration.put("KeyStore.Type", "JKS");
         configuration.put("KeyStore.Password", "wso2carbon");
         configuration.put("KeyStore.KeyAlias", "wso2carbon");
+        configuration.put("SAMLResponseValidityPeriod", 5);
     }
 
     public static String getProperty(String propertyName) {
