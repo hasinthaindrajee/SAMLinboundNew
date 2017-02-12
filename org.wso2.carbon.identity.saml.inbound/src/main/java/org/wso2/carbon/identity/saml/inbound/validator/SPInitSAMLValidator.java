@@ -23,6 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.common.base.message.MessageContext;
+import org.wso2.carbon.identity.common.internal.handler.HandlerConfig;
+import org.wso2.carbon.identity.common.internal.handler.HandlerConfigKey;
+import org.wso2.carbon.identity.common.util.IdentityUtils;
 import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
@@ -86,5 +89,9 @@ public class SPInitSAMLValidator extends SAMLValidator {
 
     public String getName() {
         return "SPInitSAMLValidator";
+    }
+
+    public int getPriority(MessageContext messageContext) {
+       return 10;
     }
 }

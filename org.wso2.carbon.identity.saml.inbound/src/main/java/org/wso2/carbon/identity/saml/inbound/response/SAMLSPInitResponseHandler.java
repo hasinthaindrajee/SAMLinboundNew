@@ -95,4 +95,8 @@ public class SAMLSPInitResponseHandler extends SAMLResponseHandler {
         return "SPInitResponseHandler";
     }
 
+    public int getPriority(MessageContext messageContext) {
+        return 15;
+    }
+
 }

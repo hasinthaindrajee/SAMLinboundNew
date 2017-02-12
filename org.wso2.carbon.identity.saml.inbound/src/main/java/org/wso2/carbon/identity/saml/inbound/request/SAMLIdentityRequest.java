@@ -1,13 +1,15 @@
 package org.wso2.carbon.identity.saml.inbound.request;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.gateway.processor.request.ClientAuthenticationRequest;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
-import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 import org.wso2.msf4j.Request;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class SAMLIdentityRequest extends ClientAuthenticationRequest {
 
@@ -23,7 +25,10 @@ public class SAMLIdentityRequest extends ClientAuthenticationRequest {
             return (String) this.getParameter(SAMLSSOConstants.RELAY_STATE);
         } else {
             try {
-                return SAMLSSOUtil.getParameterFromQueryString(this.getQueryString(), SAMLSSOConstants.RELAY_STATE);
+                String relayState = getParameter(SAMLSSOConstants.RELAY_STATE);
+                if (StringUtils.isNotEmpty(relayState)) {
+                    URLDecoder.decode(this.getQueryParameter(SAMLSSOConstants.RELAY_STATE), StandardCharsets.UTF_8.name());
+                }
             } catch (UnsupportedEncodingException e) {
 //                if (log.isDebugEnabled()) {
 //                    log.debug("Failed to decode the Relay State ", e);
@@ -44,6 +49,6 @@ public class SAMLIdentityRequest extends ClientAuthenticationRequest {
     }
 
     public boolean isRedirect() {
-        return this.getMethod() == SAMLSSOConstants.GET_METHOD;
+        return this.getHttpMethod() == SAMLSSOConstants.GET_METHOD;
     }
 }

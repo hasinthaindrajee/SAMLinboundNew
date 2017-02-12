@@ -25,7 +25,7 @@ import org.wso2.carbon.identity.gateway.api.FrameworkClientException;
 import org.wso2.carbon.identity.gateway.api.HttpIdentityRequestFactory;
 import org.wso2.carbon.identity.gateway.api.HttpIdentityResponse;
 import org.wso2.carbon.identity.gateway.api.IdentityRequest;
-import org.wso2.carbon.identity.gateway.api.InboundUtil;
+import org.wso2.carbon.identity.gateway.processor.handler.authentication.impl.util.Utility;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.carbon.identity.saml.inbound.exception.SAML2ClientException;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
@@ -48,9 +48,9 @@ public class SAMLIdentityRequestFactory extends HttpIdentityRequestFactory {
 
     @Override
     public boolean canHandle(Request request) {
-        String samlRequest = (String) request.getProperty(SAMLSSOConstants.SAML_REQUEST);
-        String spEntityID = (String) request.getProperty(SAMLSSOConstants.QueryParameter.SP_ENTITY_ID.toString());
-        String slo = (String) request.getProperty(SAMLSSOConstants.QueryParameter.SLO.toString());
+        String samlRequest = Utility.getParameter(request, SAMLSSOConstants.SAML_REQUEST);
+        String spEntityID = Utility.getParameter(request, SAMLSSOConstants.QueryParameter.SP_ENTITY_ID.toString());
+        String slo = Utility.getParameter(request, SAMLSSOConstants.QueryParameter.SLO.toString());
         if (StringUtils.isNotBlank(samlRequest) || StringUtils.isNotBlank(spEntityID) || StringUtils.isNotBlank(slo)) {
             return true;
         }
@@ -59,23 +59,23 @@ public class SAMLIdentityRequestFactory extends HttpIdentityRequestFactory {
 
     @Override
     public int getPriority() {
-        return -3;
+        return 30;
     }
 
     @Override
     public IdentityRequest.IdentityRequestBuilder create(Request request) throws FrameworkClientException {
 
-        String samlRequest = (String) request.getProperty(SAMLSSOConstants.SAML_REQUEST);
-        String spEntityID = (String) request.getProperty(SAMLSSOConstants.QueryParameter.SP_ENTITY_ID.toString());
-        String slo = (String) request.getProperty(SAMLSSOConstants.QueryParameter.SLO.toString());
-        IdentityRequest.IdentityRequestBuilder builder;
+        String samlRequest = Utility.getParameter(request, SAMLSSOConstants.SAML_REQUEST);
+        String spEntityID = Utility.getParameter(request, SAMLSSOConstants.QueryParameter.SP_ENTITY_ID.toString());
+        String slo = Utility.getParameter(request, SAMLSSOConstants.QueryParameter.SLO.toString());
+        IdentityRequest.IdentityRequestBuilder builder = null;
         if (spEntityID != null || slo != null) {
             builder = new SAMLIdpInitRequest.SAMLIdpInitRequestBuilder();
         } else if (samlRequest != null) {
             builder = new SAMLSpInitRequest.SAMLSpInitRequestBuilder
                     (request);
         } else {
-            throw FrameworkClientException.error("Invalid request message or single logout message");
+            throw new FrameworkClientException("Invalid request message or single logout message");
         }
         super.create(builder, request);
         return builder;

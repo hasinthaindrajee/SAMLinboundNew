@@ -181,4 +181,9 @@ public class HttpSAMLResponseFactory extends HttpIdentityResponseFactory {
         builder.setRedirectURL(redirectURL);
         return builder;
     }
+
+    @Override
+    public int getPriority() {
+        return 31;
+    }
 }

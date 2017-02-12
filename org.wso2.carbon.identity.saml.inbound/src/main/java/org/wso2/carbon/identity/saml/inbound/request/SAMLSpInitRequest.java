@@ -21,7 +21,6 @@ package org.wso2.carbon.identity.saml.inbound.request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
-import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 import org.wso2.msf4j.Request;
 
 import java.io.UnsupportedEncodingException;
@@ -35,11 +34,11 @@ public class SAMLSpInitRequest extends SAMLIdentityRequest {
     }
 
     public String getSignature() {
-        if (this.getParameter(SAMLSSOConstants.SIGNATURE) != null) {
-            return (String) this.getParameter(SAMLSSOConstants.SIGNATURE);
+        if (this.getBodyParameter(SAMLSSOConstants.SIGNATURE) != null) {
+            return this.getBodyParameter(SAMLSSOConstants.SIGNATURE);
         } else {
             try {
-                return SAMLSSOUtil.getParameterFromQueryString(this.getQueryString(), SAMLSSOConstants.SIGNATURE);
+                return this.getQueryParameter(SAMLSSOConstants.SIGNATURE);
             } catch (UnsupportedEncodingException e) {
                 if (log.isDebugEnabled()) {
                     log.debug("Failed to decode the Signature ", e);
@@ -50,11 +49,11 @@ public class SAMLSpInitRequest extends SAMLIdentityRequest {
     }
 
     public String getSigAlg() {
-        if (this.getParameter(SAMLSSOConstants.SIG_ALG) != null) {
-            return (String) this.getParameter(SAMLSSOConstants.SIG_ALG);
+        if (this.getBodyParameter(SAMLSSOConstants.SIG_ALG) != null) {
+            return this.getBodyParameter(SAMLSSOConstants.SIG_ALG);
         } else {
             try {
-                return SAMLSSOUtil.getParameterFromQueryString(this.getQueryString(), SAMLSSOConstants.SIG_ALG);
+                return this.getQueryParameter(SAMLSSOConstants.SIG_ALG);
             } catch (UnsupportedEncodingException e) {
                 if (log.isDebugEnabled()) {
                     log.debug("Failed to decode the Signature Algorithm ", e);
@@ -65,11 +64,11 @@ public class SAMLSpInitRequest extends SAMLIdentityRequest {
     }
 
     public String getSamlRequest() {
-        if (this.getParameter(SAMLSSOConstants.SAML_REQUEST) != null) {
-            return (String) this.getParameter(SAMLSSOConstants.SAML_REQUEST);
+        if (this.getBodyParameter(SAMLSSOConstants.SAML_REQUEST) != null) {
+            return this.getBodyParameter(SAMLSSOConstants.SAML_REQUEST);
         } else {
             try {
-                return SAMLSSOUtil.getParameterFromQueryString(this.getQueryString(), SAMLSSOConstants.SAML_REQUEST);
+                return this.getQueryParameter(SAMLSSOConstants.SAML_REQUEST);
             } catch (UnsupportedEncodingException e) {
                 if (log.isDebugEnabled()) {
                     log.debug("Failed to decode the SAML Request ", e);

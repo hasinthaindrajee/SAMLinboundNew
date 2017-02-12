@@ -241,4 +241,9 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
     public String getName() {
         return "SAMLIdpInitResponseHandler";
     }
+
+
+    public int getPriority(MessageContext messageContext) {
+        return 16;
+    }
 }

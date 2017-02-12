@@ -72,4 +72,8 @@ public class IDPInitSAMLValidator extends SAMLValidator {
     public String getName() {
         return "IDPInitSAMLValidator";
     }
+
+    public int getPriority(MessageContext messageContext) {
+        return 11;
+    }
 }
