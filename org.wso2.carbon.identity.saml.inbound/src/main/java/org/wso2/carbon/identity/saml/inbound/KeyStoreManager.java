@@ -23,9 +23,9 @@ public class KeyStoreManager {
 
     public KeyStore initKeyStore() {
 
-        String keyStorePath = SAMLConfigurations.getProperty("KeyStore.Location");
-        String keystorePassword = SAMLConfigurations.getProperty("KeyStore.Password");
-        String keyStoreType = SAMLConfigurations.getProperty("KeyStore.Type");
+        String keyStorePath = SAMLConfigurations.getInstance().getKeyStoreLocation();
+        String keystorePassword = SAMLConfigurations.getInstance().getKeyStorePassword();
+        String keyStoreType = SAMLConfigurations.getInstance().getKeyStoreType();
 
         if (this.primaryKeyStore == null) {
             FileInputStream in = null;
@@ -54,8 +54,8 @@ public class KeyStoreManager {
 
     public Key getPrivateKey() throws IdentityException {
         KeyStore keyStore = getKeyStore();
-        String alias = SAMLConfigurations.getProperty("KeyStore.KeyAlias");
-        String keystorePassword = SAMLConfigurations.getProperty("KeyStore.Password");
+        String alias = SAMLConfigurations.getInstance().getKeyStoreAlias();
+        String keystorePassword = SAMLConfigurations.getInstance().getKeyStorePassword();
         try {
             return keyStore.getKey(alias, keystorePassword.toCharArray());
         } catch (Exception e) {

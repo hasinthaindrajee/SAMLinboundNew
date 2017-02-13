@@ -400,25 +400,6 @@ public class SAMLSSOUtil {
         return Base64.encodeBytes(byteArrayOutputStream.toByteArray(), Base64.DONT_BREAK_LINES);
     }
 
-    public static String getSSOResponseHTML() {
-        return "<html>\n" +
-                "\t<body>\n" +
-                "        \t<p>You are now redirected back to $acUrl \n" +
-                "        \tIf the redirection fails, please click the post button.</p>\n" +
-                "\n" +
-                "        \t<form method='post' action='$acUrl'>\n" +
-                "       \t\t\t<p>\n" +
-                "\t\t\t\t\t<!--$params-->\n" +
-                "                    <!--$additionalParams-->\n" +
-                "        \t\t\t<button type='submit'>POST</button>\n" +
-                "       \t\t\t</p>\n" +
-                "       \t\t</form>\n" +
-                "       \t\t<script type='text/javascript'>\n" +
-                "        \t\tdocument.forms[0].submit();\n" +
-                "        \t</script>\n" +
-                "        </body>\n" +
-                "</html>";
-    }
 
     /**
      * @param tenantDomain
@@ -652,42 +633,7 @@ public class SAMLSSOUtil {
     public static Issuer getIssuerFromTenantDomain(String tenantDomain) throws IdentityException {
 
         Issuer issuer = new IssuerBuilder().buildObject();
-        String idPEntityId = null;
-        //IdentityProvider identityProvider;
-        int tenantId;
-        // TODO
-//        if (StringUtils.isEmpty(tenantDomain) || "null".equals(tenantDomain)) {
-//            tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-//            tenantId = MultitenantConstants.SUPER_TENANT_ID;
-//        } else {
-//            try {
-//                tenantId = SAMLSSOUtil.getRealmService().getTenantManager().getTenantId(tenantDomain);
-//            } catch (UserStoreException e) {
-//                throw IdentityException.error("Error occurred while retrieving tenant id from tenant domain", e);
-//            }
-//
-//            if (MultitenantConstants.INVALID_TENANT_ID == tenantId) {
-//                throw IdentityException.error("Invalid tenant domain - '" + tenantDomain + "'");
-//            }
-//        }
-//
-//        IdentityTenantUtil.initializeRegistry(tenantId, tenantDomain);
-
-//        try {
-//            identityProvider = IdentityProviderManager.getInstance().getResidentIdP(tenantDomain);
-//        } catch (IdentityProviderManagementException e) {
-//            throw IdentityException.error(
-//                    "Error occurred while retrieving Resident Identity Provider information for tenant " +
-//                            tenantDomain, e);
-//        }
-//        FederatedAuthenticatorConfig[] authnConfigs = identityProvider.getFederatedAuthenticatorConfigs();
-//        for (FederatedAuthenticatorConfig config : authnConfigs) {
-//            if (IdentityApplicationConstants.Authenticator.SAML2SSO.NAME.equals(config.getName())) {
-//                SAML2SSOFederatedAuthenticatorConfig samlFedAuthnConfig = new SAML2SSOFederatedAuthenticatorConfig
-//                        (config);
-//                idPEntityId = samlFedAuthnConfig.getIdpEntityId();
-//            }
-//        }
+        String idPEntityId = SAMLConfigurations.getInstance().getIdpEntityId();
         if (idPEntityId == null) {
             idPEntityId = "SSOService.EntityID";
         }
@@ -934,6 +880,8 @@ public class SAMLSSOUtil {
         serviceProvider.setDoSignResponse(true);
         serviceProvider.setSigningAlgorithmUri("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
         serviceProvider.setDigestAlgorithmUri("http://www.w3.org/2000/09/xmldsig#sha1");
+        serviceProvider.setDoValidateSignatureInRequests(true);
+        serviceProvider.setCertAlias("wso2carbon");
         return serviceProvider;
 //        try {
 //            SSOServiceProviderConfigManager stratosIdpConfigManager = SSOServiceProviderConfigManager
@@ -1143,16 +1091,5 @@ public class SAMLSSOUtil {
         SAMLSSOUtil.singleLogoutRetryInterval = singleLogoutRetryInterval;
     }
 
-    public static int getSAMLResponseValidityPeriod() {
-        // TODO
-//        if (StringUtils.isNotBlank(IdentityUtil.getProperty(IdentityConstants.ServerConfig
-//                .SAML_RESPONSE_VALIDITY_PERIOD))) {
-//            return Integer.parseInt(IdentityUtil.getProperty(
-//                    IdentityConstants.ServerConfig.SAML_RESPONSE_VALIDITY_PERIOD).trim());
-//        } else {
-        return 5;
-//
-
-    }
 
 }

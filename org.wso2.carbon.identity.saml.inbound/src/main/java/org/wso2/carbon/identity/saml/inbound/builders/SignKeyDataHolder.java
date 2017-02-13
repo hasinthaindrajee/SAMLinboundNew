@@ -50,7 +50,7 @@ public class SignKeyDataHolder implements X509Credential {
 
     public SignKeyDataHolder() throws IdentityException {
 
-        String keyAlias = SAMLConfigurations.getProperty("KeyStore.KeyAlias");
+        String keyAlias = SAMLConfigurations.getInstance().getKeyStoreAlias();
         KeyStoreManager keyMan;
         Certificate[] certificates;
 

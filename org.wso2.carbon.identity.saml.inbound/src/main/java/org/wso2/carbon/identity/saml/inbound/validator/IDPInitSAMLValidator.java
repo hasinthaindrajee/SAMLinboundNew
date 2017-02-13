@@ -61,12 +61,12 @@ public class IDPInitSAMLValidator extends SAMLValidator {
                     return FrameworkHandlerResponse.CONTINUE;
                 }
             } catch (IdentityException e) {
-                throw new RequestHandlerException("Error while validating SAAML request");
+                throw new RequestHandlerException("Error while validating SAML request");
             } catch (IOException e) {
-                throw new RequestHandlerException("Error while validating SAAML request");
+                throw new RequestHandlerException("Error while validating SAML request");
             }
         }
-        throw new RequestHandlerException("Error while validating SAAML request");
+        throw new RequestHandlerException("Error while validating SAML request");
     }
 
     public String getName() {

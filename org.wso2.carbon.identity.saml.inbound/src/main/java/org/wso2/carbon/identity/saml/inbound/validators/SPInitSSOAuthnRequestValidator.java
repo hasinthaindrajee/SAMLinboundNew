@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.request.RequestHandlerException;
+import org.wso2.carbon.identity.saml.inbound.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.carbon.identity.saml.inbound.builders.signature.DefaultSSOSigner;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
@@ -95,37 +96,17 @@ public class SPInitSSOAuthnRequestValidator {
                     ".", authnReq.getAssertionConsumerServiceURL()));
         }
 
-        // TODO
-
-//        try {
-//            if (!SAMLSSOUtil.isSAMLIssuerExists(issuer.getValue(),
-//                    SAMLSSOUtil.getTenantDomainFromThreadLocal())) {
-//                String message = "A Service Provider with the Issuer '" + issuer.getValue() + "' is not " +
-//                        "registered. Service Provider should be registered in " + "advance";
-//                if (log.isDebugEnabled()) {
-//                    log.debug(message);
-//                }
-//                messageContext.setValid(false);
-//                throw SAML2ClientException.error(SAMLSSOUtil.buildErrorResponse(SAMLSSOConstants.StatusCodes
-//                        .REQUESTOR_ERROR, message, null));
-//            }
-//        } catch (UserStoreException e) {
-//            if (log.isDebugEnabled()) {
-//                log.debug("Error occurred while handling SAML2 SSO request", e);
-//            }
-//            messageContext.setValid(false);
-//            String errorResp = SAMLSSOUtil.buildErrorResponse(SAMLSSOConstants.StatusCodes.IDENTITY_PROVIDER_ERROR,
-//                    "Error occurred while handling SAML2 SSO request", null);
-//            throw SAML2ClientException.error(errorResp, SAMLSSOConstants.Notification.EXCEPTION_STATUS,
-//                    SAMLSSOConstants.Notification.EXCEPTION_MESSAGE, null);
-//        } catch (IdentityException e) {
-//            log.error("Error when processing the authentication request!", e);
-//            messageContext.setValid(false);
-//            String errorResp = SAMLSSOUtil.buildErrorResponse(SAMLSSOConstants.StatusCodes
-//                    .IDENTITY_PROVIDER_ERROR, "Error when processing the authentication request", null);
-//            throw SAML2ClientException.error(errorResp, SAMLSSOConstants.Notification.EXCEPTION_STATUS,
-//                    SAMLSSOConstants.Notification.EXCEPTION_MESSAGE, null);
-//        }
+        if (!SAMLSSOUtil.isSAMLIssuerExists(issuer.getValue(),
+                SAMLSSOUtil.getTenantDomainFromThreadLocal())) {
+            String message = "A Service Provider with the Issuer '" + issuer.getValue() + "' is not " +
+                    "registered. Service Provider should be registered in " + "advance";
+            if (log.isDebugEnabled()) {
+                log.debug(message);
+            }
+            messageContext.setValid(false);
+            throw SAML2ClientException.error(SAMLSSOUtil.buildErrorResponse(SAMLSSOConstants.StatusCodes
+                    .REQUESTOR_ERROR, message, null));
+        }
 
         // Issuer Format attribute
         if ((StringUtils.isNotBlank(issuer.getFormat())) &&
@@ -210,7 +191,7 @@ public class SPInitSSOAuthnRequestValidator {
         SAMLSSOServiceProviderDO serviceProviderConfigs = messageContext.getSamlssoServiceProviderDO();
         if (serviceProviderConfigs.isDoValidateSignatureInRequests()) {
             // TODO
-            List<String> idpUrlSet = new ArrayList<>();
+            List<String> idpUrlSet = SAMLConfigurations.getInstance().getDestinationUrls();
 
             if (messageContext.getDestination() == null || !idpUrlSet.contains(messageContext.getDestination())) {
                 String msg = "Destination validation for Authentication Request failed. " + "Received: [" +

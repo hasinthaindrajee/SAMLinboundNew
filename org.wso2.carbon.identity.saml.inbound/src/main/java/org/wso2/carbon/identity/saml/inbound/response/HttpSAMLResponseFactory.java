@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.gateway.api.HttpIdentityResponse;
 import org.wso2.carbon.identity.gateway.api.HttpIdentityResponseFactory;
 import org.wso2.carbon.identity.gateway.api.IdentityResponse;
+import org.wso2.carbon.identity.saml.inbound.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 
@@ -79,7 +80,7 @@ public class HttpSAMLResponseFactory extends HttpIdentityResponseFactory {
         String acUrl = loginResponse.getAcsUrl();
         builder.setRedirectURL(acUrl);
         builder.setContentType("text/html");
-        if (SAMLSSOUtil.getSSOResponseHTML() != null) {
+        if (SAMLConfigurations.getInstance().getSsoResponseHtml() != null) {
             builder.setBody(getRedirectHtml(acUrl, relayState, authenticatedIdPs, loginResponse));
         } else {
             builder.setBody(getPostHtml(acUrl, relayState, authenticatedIdPs, loginResponse));
@@ -91,7 +92,7 @@ public class HttpSAMLResponseFactory extends HttpIdentityResponseFactory {
     private String getRedirectHtml(String acUrl, String relayState, String authenticatedIdPs, SAMLLoginResponse
             loginResponse) {
         String finalPage = null;
-        String htmlPage = SAMLSSOUtil.getSSOResponseHTML();
+        String htmlPage = SAMLConfigurations.getInstance().getSsoResponseHtml();
         String pageWithAcs = htmlPage.replace("$acUrl", acUrl);
         String pageWithAcsResponse = pageWithAcs.replace("<!--$params-->", "<!--$params-->\n" + "<input " +
                 "type='hidden' name='SAMLResponse' value='" + Encode.forHtmlAttribute(loginResponse.getRespString

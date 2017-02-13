@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
 import org.wso2.carbon.identity.gateway.processor.handler.response.AbstractResponseHandler;
+import org.wso2.carbon.identity.saml.inbound.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.carbon.identity.saml.inbound.builders.SignKeyDataHolder;
 import org.wso2.carbon.identity.saml.inbound.builders.assertion.DefaultSAMLAssertionBuilder;
@@ -50,7 +51,7 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
         response.setVersion(SAMLVersion.VERSION_20);
         DateTime issueInstant = new DateTime();
         DateTime notOnOrAfter = new DateTime(issueInstant.getMillis()
-                + SAMLSSOUtil.getSAMLResponseValidityPeriod() * 60 * 1000L);
+                + SAMLConfigurations.getInstance().getSamlResponseValidityPeriod() * 60 * 1000L);
         response.setIssueInstant(issueInstant);
         //@TODO sessionHandling
         String sessionId = "";

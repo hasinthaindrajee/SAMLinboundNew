@@ -1,15 +1,22 @@
 package org.wso2.carbon.identity.saml.inbound.response;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.common.base.message.MessageContext;
 import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
+import org.wso2.carbon.identity.gateway.api.IdentityRequest;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.response.ResponseException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLSpInitRequest;
+import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SAMLSPInitResponseHandler extends SAMLResponseHandler {
 
