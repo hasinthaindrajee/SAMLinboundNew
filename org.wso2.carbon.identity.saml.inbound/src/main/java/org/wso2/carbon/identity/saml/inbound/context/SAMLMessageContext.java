@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.saml.inbound.context;
 
 import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLResponseHandlerConfig;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.model.SAMLSSOServiceProviderDO;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdentityRequest;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdpInitRequest;
@@ -49,6 +51,9 @@ public class SAMLMessageContext<T1 extends Serializable, T2 extends Serializable
     private String subject;
     private String tenantDomain;
     private int attributeConsumingServiceIndex;
+
+    private SAMLValidatorConfig samlValidatorConfig;
+    private SAMLResponseHandlerConfig responseHandlerConfig;
     private SAMLSSOServiceProviderDO samlssoServiceProviderDO;
 
     public SAMLMessageContext(SAMLIdentityRequest request, Map<T1, T2> parameters) {
@@ -62,6 +67,22 @@ public class SAMLMessageContext<T1 extends Serializable, T2 extends Serializable
 
     public void setDestination(String destination) {
         this.destination = destination;
+    }
+
+    public SAMLValidatorConfig getSamlValidatorConfig() {
+        return samlValidatorConfig;
+    }
+
+    public void setSamlValidatorConfig(SAMLValidatorConfig samlValidatorConfig) {
+        this.samlValidatorConfig = samlValidatorConfig;
+    }
+
+    public SAMLResponseHandlerConfig getResponseHandlerConfig() {
+        return responseHandlerConfig;
+    }
+
+    public void setResponseHandlerConfig(SAMLResponseHandlerConfig responseHandlerConfig) {
+        this.responseHandlerConfig = responseHandlerConfig;
     }
 
     public String getDestination() {

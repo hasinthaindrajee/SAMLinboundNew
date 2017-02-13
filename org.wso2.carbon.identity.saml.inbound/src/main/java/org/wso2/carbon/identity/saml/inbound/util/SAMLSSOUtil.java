@@ -851,6 +851,7 @@ public class SAMLSSOUtil {
 //                claimsMap.put(entry.getKey().getRemoteClaim().getClaimUri(), entry.getValue());
 //            }
 //        }
+        claimsMap.put("org.wso2.test" , "somevaluehere");
         return claimsMap;
     }
 
@@ -882,6 +883,8 @@ public class SAMLSSOUtil {
         serviceProvider.setDigestAlgorithmUri("http://www.w3.org/2000/09/xmldsig#sha1");
         serviceProvider.setDoValidateSignatureInRequests(true);
         serviceProvider.setCertAlias("wso2carbon");
+        serviceProvider.setAttributeConsumingServiceIndex("2342342");
+        serviceProvider.setEnableAttributesByDefault(true);
         return serviceProvider;
 //        try {
 //            SSOServiceProviderConfigManager stratosIdpConfigManager = SSOServiceProviderConfigManager

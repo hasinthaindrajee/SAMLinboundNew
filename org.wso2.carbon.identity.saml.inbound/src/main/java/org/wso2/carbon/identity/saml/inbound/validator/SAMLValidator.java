@@ -36,6 +36,9 @@ public abstract class SAMLValidator extends AbstractRequestHandler {
         return FrameworkHandlerResponse.CONTINUE;
     }
 
-
+    @Override
+    protected String getValidatorType() {
+        return "SAML";
+    }
 
 }

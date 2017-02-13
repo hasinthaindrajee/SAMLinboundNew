@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.request.RequestHandlerException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdentityRequest;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLSpInitRequest;
@@ -69,7 +70,13 @@ public class SPInitSAMLValidator extends SAMLValidator {
             XMLObject request = SAMLSSOUtil.unmarshall(decodedRequest);
 
             if (request instanceof AuthnRequest) {
+                authenticationContext.setUniqueId(((AuthnRequest) request).getIssuer().getValue());
+                if(authenticationContext.getServiceProvider() == null) {
+                    throw new RequestHandlerException("Error while validating SAML request : No service provider " +
+                            "found with issuer : " + ((AuthnRequest) request).getIssuer().getValue());
+                }
                 SAMLMessageContext messageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
+
                 messageContext.setDestination(((AuthnRequest) request).getDestination());
                 messageContext.setId(((AuthnRequest) request).getID());
                 messageContext.setAssertionConsumerUrl(((AuthnRequest) request).getAssertionConsumerServiceURL());
