@@ -28,10 +28,9 @@ import org.wso2.carbon.identity.gateway.api.IdentityRequest;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.request.RequestHandlerException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
-import org.wso2.carbon.identity.saml.inbound.model.SAMLSSOServiceProviderDO;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdpInitRequest;
-import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 import org.wso2.carbon.identity.saml.inbound.validators.IdPInitSSOAuthnRequestValidator;
 
 import java.io.IOException;
@@ -68,10 +67,9 @@ public class IDPInitSAMLValidator extends SAMLValidator {
                 authenticationContext.setUniqueId(spEntityID);
                 validateServiceProvider(authenticationContext);
                 if (validator.validate(null)) {
-                    SAMLSSOServiceProviderDO serviceProviderConfigs = SAMLSSOUtil.getServiceProviderConfig(messageContext);
-                    messageContext.setSamlssoServiceProviderDO(serviceProviderConfigs);
+                    SAMLValidatorConfig samlValidatorConfig = messageContext.getSamlValidatorConfig();
 
-                    if (serviceProviderConfigs == null) {
+                    if (samlValidatorConfig == null) {
                         String msg = "A Service Provider with the Issuer '" + messageContext.getIssuer() + "' is not " +
                                 "registered." + " Service Provider should be registered in advance.";
                         if (log.isDebugEnabled()) {
@@ -80,7 +78,7 @@ public class IDPInitSAMLValidator extends SAMLValidator {
                         throw new RequestHandlerException(msg);
                     }
 
-                    if (!serviceProviderConfigs.isIdPInitSSOEnabled()) {
+                    if (!samlValidatorConfig.isIdPInitSSOEnabled()) {
                         String msg = "IdP initiated SSO not enabled for service provider '" + messageContext.getIssuer() + "'.";
                         if (log.isDebugEnabled()) {
                             log.debug(msg);
@@ -88,20 +86,20 @@ public class IDPInitSAMLValidator extends SAMLValidator {
                         throw new RequestHandlerException(msg);
                     }
 
-                    if (serviceProviderConfigs.isEnableAttributesByDefault() && serviceProviderConfigs
+                    if (samlValidatorConfig.isEnableAttributesByDefault() && samlValidatorConfig
                             .getAttributeConsumingServiceIndex() != null) {
-                        messageContext.setAttributeConsumingServiceIndex(Integer.parseInt(serviceProviderConfigs
+                        messageContext.setAttributeConsumingServiceIndex(Integer.parseInt(samlValidatorConfig
                                 .getAttributeConsumingServiceIndex()));
                     }
 
 
                     String acsUrl = StringUtils.isNotBlank(((SAMLIdpInitRequest) messageContext.getIdentityRequest()).getAcs()) ? (
-                            (SAMLIdpInitRequest) messageContext.getIdentityRequest()).getAcs() : serviceProviderConfigs
+                            (SAMLIdpInitRequest) messageContext.getIdentityRequest()).getAcs() : samlValidatorConfig
                             .getDefaultAssertionConsumerUrl();
-                    if (StringUtils.isBlank(acsUrl) || !serviceProviderConfigs.getAssertionConsumerUrlList().contains
+                    if (StringUtils.isBlank(acsUrl) || !samlValidatorConfig.getAssertionConsumerUrlList().contains
                             (acsUrl)) {
                         String msg = "ALERT: Invalid Assertion Consumer URL value '" + acsUrl + "' in the " +
-                                "AuthnRequest message from  the issuer '" + serviceProviderConfigs.getIssuer() +
+                                "AuthnRequest message from  the issuer '" + samlValidatorConfig.getIssuer() +
                                 "'. Possibly " + "an attempt for a spoofing attack";
                         if (log.isDebugEnabled()) {
                             log.debug(msg);

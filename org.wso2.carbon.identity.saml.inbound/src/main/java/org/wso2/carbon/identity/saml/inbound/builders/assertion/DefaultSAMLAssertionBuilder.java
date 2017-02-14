@@ -56,9 +56,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLResponseHandlerConfig;
 import org.wso2.carbon.identity.saml.inbound.builders.SignKeyDataHolder;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
-import org.wso2.carbon.identity.saml.inbound.model.SAMLSSOServiceProviderDO;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 
 import java.util.Iterator;
@@ -88,7 +88,7 @@ public class DefaultSAMLAssertionBuilder implements SAMLAssertionBuilder {
             // AuthenticationResult authnResult = context.getAuthenticationResult();
             DateTime currentTime = new DateTime();
             Assertion samlAssertion = new AssertionBuilder().buildObject();
-            SAMLSSOServiceProviderDO samlssoServiceProviderDO = context.getSamlssoServiceProviderDO();
+            SAMLResponseHandlerConfig samlResponseHandlerConfig = context.getResponseHandlerConfig();
             samlAssertion.setID(SAMLSSOUtil.createID());
             samlAssertion.setVersion(SAMLVersion.VERSION_20);
             samlAssertion.setIssuer(SAMLSSOUtil.getIssuer());
@@ -98,8 +98,8 @@ public class DefaultSAMLAssertionBuilder implements SAMLAssertionBuilder {
             NameID nameId = new NameIDBuilder().buildObject();
             // TODO
             nameId.setValue("admin");
-            if (samlssoServiceProviderDO.getNameIDFormat() != null) {
-                nameId.setFormat(samlssoServiceProviderDO.getNameIDFormat());
+            if (samlResponseHandlerConfig.getNameIdFormat() != null) {
+                nameId.setFormat(samlResponseHandlerConfig.getNameIdFormat());
             } else {
                 nameId.setFormat(NameIdentifier.EMAIL);
             }
@@ -118,9 +118,9 @@ public class DefaultSAMLAssertionBuilder implements SAMLAssertionBuilder {
             subjectConfirmation.setSubjectConfirmationData(scData);
             subject.getSubjectConfirmations().add(subjectConfirmation);
 
-            if (samlssoServiceProviderDO.getRequestedRecipients() != null && samlssoServiceProviderDO
+            if (samlResponseHandlerConfig.getRequestedRecipients() != null && samlResponseHandlerConfig
                     .getRequestedRecipients().length > 0) {
-                for (String recipient : samlssoServiceProviderDO.getRequestedRecipients()) {
+                for (String recipient : samlResponseHandlerConfig.getRequestedRecipients()) {
                     subjectConfirmation = new SubjectConfirmationBuilder()
                             .buildObject();
                     subjectConfirmation.setMethod(SAMLSSOConstants.SUBJECT_CONFIRM_BEARER);
@@ -145,7 +145,7 @@ public class DefaultSAMLAssertionBuilder implements SAMLAssertionBuilder {
             authCtxClassRef.setAuthnContextClassRef(AuthnContext.PASSWORD_AUTHN_CTX);
             authContext.setAuthnContextClassRef(authCtxClassRef);
             authStmt.setAuthnContext(authContext);
-            if (samlssoServiceProviderDO.isDoSingleLogout()) {
+            if (samlResponseHandlerConfig.isDoSingleLogout()) {
                 authStmt.setSessionIndex(sessionId);
             }
             samlAssertion.getAuthnStatements().add(authStmt);
@@ -167,8 +167,8 @@ public class DefaultSAMLAssertionBuilder implements SAMLAssertionBuilder {
             Audience issuerAudience = new AudienceBuilder().buildObject();
             issuerAudience.setAudienceURI(context.getIssuerWithDomain());
             audienceRestriction.getAudiences().add(issuerAudience);
-            if (samlssoServiceProviderDO.getRequestedAudiences() != null) {
-                for (String requestedAudience : samlssoServiceProviderDO.getRequestedAudiences()) {
+            if (samlResponseHandlerConfig.getRequestedAudiences() != null) {
+                for (String requestedAudience : samlResponseHandlerConfig.getRequestedAudiences()) {
                     Audience audience = new AudienceBuilder().buildObject();
                     audience.setAudienceURI(requestedAudience);
                     audienceRestriction.getAudiences().add(audience);
@@ -181,9 +181,9 @@ public class DefaultSAMLAssertionBuilder implements SAMLAssertionBuilder {
             samlAssertion.setConditions(conditions);
 
 
-            if (samlssoServiceProviderDO.isDoSignAssertions()) {
-                SAMLSSOUtil.setSignature(samlAssertion, samlssoServiceProviderDO.getSigningAlgorithmUri(),
-                        samlssoServiceProviderDO.getDigestAlgorithmUri(), new SignKeyDataHolder());
+            if (samlResponseHandlerConfig.isDoSignAssertions()) {
+                SAMLSSOUtil.setSignature(samlAssertion, samlResponseHandlerConfig.getSigningAlgorithmUri(),
+                        samlResponseHandlerConfig.getDigestAlgorithmUri(), new SignKeyDataHolder());
             }
 
             return samlAssertion;

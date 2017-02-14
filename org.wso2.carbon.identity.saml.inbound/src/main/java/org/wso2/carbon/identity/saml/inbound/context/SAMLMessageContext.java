@@ -21,7 +21,6 @@ package org.wso2.carbon.identity.saml.inbound.context;
 import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
 import org.wso2.carbon.identity.saml.inbound.bean.SAMLResponseHandlerConfig;
 import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
-import org.wso2.carbon.identity.saml.inbound.model.SAMLSSOServiceProviderDO;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdentityRequest;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdpInitRequest;
 
@@ -54,7 +53,6 @@ public class SAMLMessageContext<T1 extends Serializable, T2 extends Serializable
 
     private SAMLValidatorConfig samlValidatorConfig;
     private SAMLResponseHandlerConfig responseHandlerConfig;
-    private SAMLSSOServiceProviderDO samlssoServiceProviderDO;
 
     public SAMLMessageContext(SAMLIdentityRequest request, Map<T1, T2> parameters) {
         super(request, parameters);
@@ -157,7 +155,7 @@ public class SAMLMessageContext<T1 extends Serializable, T2 extends Serializable
         if (!isIdpInitSSO()) {
             return this.assertionConsumerUrl;
         } else {
-            return samlssoServiceProviderDO.getDefaultAssertionConsumerUrl();
+            return getSamlValidatorConfig().getDefaultAssertionConsumerUrl();
         }
     }
 
@@ -201,11 +199,6 @@ public class SAMLMessageContext<T1 extends Serializable, T2 extends Serializable
 //        }
 //        return new AuthenticationResult();
 //    }
-    public SAMLSSOServiceProviderDO getSamlssoServiceProviderDO() {
-        return samlssoServiceProviderDO;
-    }
 
-    public void setSamlssoServiceProviderDO(SAMLSSOServiceProviderDO samlssoServiceProviderDO) {
-        this.samlssoServiceProviderDO = samlssoServiceProviderDO;
-    }
+
 }

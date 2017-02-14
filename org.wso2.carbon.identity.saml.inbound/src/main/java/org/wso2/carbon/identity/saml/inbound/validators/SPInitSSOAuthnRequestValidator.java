@@ -32,16 +32,15 @@ import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.request.RequestHandlerException;
 import org.wso2.carbon.identity.saml.inbound.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.builders.signature.DefaultSSOSigner;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.exception.IdentitySAML2SSOException;
 import org.wso2.carbon.identity.saml.inbound.exception.SAML2ClientException;
-import org.wso2.carbon.identity.saml.inbound.model.SAMLSSOServiceProviderDO;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLSpInitRequest;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -120,20 +119,7 @@ public class SPInitSSOAuthnRequestValidator {
                     .getAssertionConsumerServiceURL()));
         }
 
-        SAMLSSOServiceProviderDO spDO = SAMLSSOUtil.getServiceProviderConfig(messageContext);
-        if (spDO != null) {
-            messageContext.setSamlssoServiceProviderDO(spDO);
-        } else {
-            String msg = "A Service Provider with the Issuer '" + messageContext.getIssuer() + "' is not " +
-                    "registered." + " Service Provider should be registered in advance.";
-            if (log.isDebugEnabled()) {
-                log.debug(msg);
-            }
-            messageContext.setValid(false);
-            throw SAML2ClientException.error(SAMLSSOUtil.buildErrorResponse(SAMLSSOConstants.StatusCodes
-                    .REQUESTOR_ERROR, msg, authnReq.getAssertionConsumerServiceURL()));
-        }
-
+        SAMLValidatorConfig samlValidatorConfig = messageContext.getSamlValidatorConfig();
         // Check for a Spoofing attack
         String acsUrl = authnReq.getAssertionConsumerServiceURL();
         boolean acsValidated = false;
@@ -142,7 +128,7 @@ public class SPInitSSOAuthnRequestValidator {
 
         if (!acsValidated) {
             if (log.isDebugEnabled()) {
-                log.debug("Invalid ACS URL value " + acsUrl + " in the AuthnRequest message from " + spDO
+                log.debug("Invalid ACS URL value " + acsUrl + " in the AuthnRequest message from " + samlValidatorConfig
                         .getIssuer() + "\n" + "Possibly an attempt for a spoofing attack from Provider " +
                         authnReq.getIssuer().getValue());
             }
@@ -188,8 +174,8 @@ public class SPInitSSOAuthnRequestValidator {
 
 
     private boolean validateFurther(AuthnRequest authnReq) throws IOException, IdentityException {
-        SAMLSSOServiceProviderDO serviceProviderConfigs = messageContext.getSamlssoServiceProviderDO();
-        if (serviceProviderConfigs.isDoValidateSignatureInRequests()) {
+        SAMLValidatorConfig samlValidatorConfig = messageContext.getSamlValidatorConfig();
+        if (samlValidatorConfig.isDoValidateSignatureInRequests()) {
             // TODO
             List<String> idpUrlSet = SAMLConfigurations.getInstance().getDestinationUrls();
 
@@ -218,10 +204,10 @@ public class SPInitSSOAuthnRequestValidator {
         } else {
             //Validate the assertion consumer url,  only if request is not signed.
             String acsUrl = messageContext.getAssertionConsumerURL();
-            if (StringUtils.isBlank(acsUrl) || !serviceProviderConfigs.getAssertionConsumerUrlList().contains
+            if (StringUtils.isBlank(acsUrl) || !samlValidatorConfig.getAssertionConsumerUrlList().contains
                     (acsUrl)) {
                 String msg = "ALERT: Invalid Assertion Consumer URL value '" + acsUrl + "' in the " +
-                        "AuthnRequest message from  the issuer '" + serviceProviderConfigs.getIssuer() +
+                        "AuthnRequest message from  the issuer '" + samlValidatorConfig.getIssuer() +
                         "'. Possibly " + "an attempt for a spoofing attack";
                 if (log.isDebugEnabled()) {
                     log.debug(msg);
@@ -240,9 +226,9 @@ public class SPInitSSOAuthnRequestValidator {
             log.debug("Validating SAML Request signature");
         }
 
-        SAMLSSOServiceProviderDO serviceProvider = messageContext.getSamlssoServiceProviderDO();
+        SAMLValidatorConfig samlValidatorConfig = messageContext.getSamlValidatorConfig();
 
-        String alias = serviceProvider.getCertAlias();
+        String alias = samlValidatorConfig.getCertAlias();
         RequestAbstractType request = null;
         try {
             String decodedReq = null;

@@ -8,8 +8,8 @@ import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.response.ResponseException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLResponseHandlerConfig;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
-import org.wso2.carbon.identity.saml.inbound.model.SAMLSSOServiceProviderDO;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdpInitRequest;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 
@@ -28,38 +28,38 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
         FrameworkHandlerResponse response = FrameworkHandlerResponse.REDIRECT;
         SAMLMessageContext samlMessageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
         SAMLResponse.SAMLResponseBuilder builder;
-            String destination = samlMessageContext.getDestination();
-            String errorResp = null;
-            try {
-                errorResp = SAMLSSOUtil.buildErrorResponse(SAMLSSOConstants.StatusCodes.AUTHN_FAILURE,
-                        "User authentication failed", destination);
-            } catch (IdentityException e) {
-                builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(authenticationContext);
-                // TODO
+        String destination = samlMessageContext.getDestination();
+        String errorResp = null;
+        try {
+            errorResp = SAMLSSOUtil.buildErrorResponse(SAMLSSOConstants.StatusCodes.AUTHN_FAILURE,
+                    "User authentication failed", destination);
+        } catch (IdentityException e) {
+            builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(authenticationContext);
+            // TODO
 //            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setErrorResponse(buildErrorResponse
 //                    (122, SAMLSSOConstants.StatusCodes
 //                            .AUTHN_FAILURE, "Authentication Failure, invalid username or password.", null));
-                response.setIdentityResponseBuilder(builder);
-                return response;
-            } catch (IOException e) {
-                builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(authenticationContext);
-                // TODO
-//            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setErrorResponse(buildErrorResponse
-//                    (122, SAMLSSOConstants.StatusCodes
-//                            .AUTHN_FAILURE, "Authentication Failure, invalid username or password.", null));
-                response.setIdentityResponseBuilder(builder);
-                return response;
-            }
-            builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(samlMessageContext);
-            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setErrorResponse(errorResp);
-            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setStatus(SAMLSSOConstants
-                    .Notification.EXCEPTION_STATUS);
-            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setMessageLog(SAMLSSOConstants
-                    .Notification.EXCEPTION_MESSAGE);
-            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setAcsUrl(((SAMLIdpInitRequest)
-                    samlMessageContext.getIdentityRequest()).getAcs());
             response.setIdentityResponseBuilder(builder);
             return response;
+        } catch (IOException e) {
+            builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(authenticationContext);
+            // TODO
+//            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setErrorResponse(buildErrorResponse
+//                    (122, SAMLSSOConstants.StatusCodes
+//                            .AUTHN_FAILURE, "Authentication Failure, invalid username or password.", null));
+            response.setIdentityResponseBuilder(builder);
+            return response;
+        }
+        builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(samlMessageContext);
+        ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setErrorResponse(errorResp);
+        ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setStatus(SAMLSSOConstants
+                .Notification.EXCEPTION_STATUS);
+        ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setMessageLog(SAMLSSOConstants
+                .Notification.EXCEPTION_MESSAGE);
+        ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setAcsUrl(((SAMLIdpInitRequest)
+                samlMessageContext.getIdentityRequest()).getAcs());
+        response.setIdentityResponseBuilder(builder);
+        return response;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
             ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setMessageLog(SAMLSSOConstants
                     .Notification.EXCEPTION_MESSAGE);
             ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setAcsUrl(samlMessageContext
-                    .getSamlssoServiceProviderDO().getDefaultAssertionConsumerUrl());
+                    .getResponseHandlerConfig().getDefaultAssertionConsumerUrl());
             response.setIdentityResponseBuilder(builder);
             return response;
         }
@@ -124,14 +124,13 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
             IdentityException {
 
         SAMLMessageContext messageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
-        SAMLSSOServiceProviderDO serviceProviderConfigs = SAMLSSOUtil.getServiceProviderConfig(messageContext);
-        messageContext.setSamlssoServiceProviderDO(serviceProviderConfigs);
+        SAMLResponseHandlerConfig samlResponseHandlerConfig = messageContext.getResponseHandlerConfig();
         SAMLResponse.SAMLResponseBuilder builder;
 
         // TODO : persist the session
         if (isAuthenticated) {
             builder = new SAMLLoginResponse.SAMLLoginResponseBuilder(authenticationContext);
-            String respString = setResponse(authenticationContext,((SAMLLoginResponse.SAMLLoginResponseBuilder)
+            String respString = setResponse(authenticationContext, ((SAMLLoginResponse.SAMLLoginResponseBuilder)
                     builder));
             if (log.isDebugEnabled()) {
                 log.debug("Authentication successfully processed. The SAMLResponse is :" + respString);
@@ -147,7 +146,7 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
             builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(messageContext);
             ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setErrorResponse(SAMLSSOUtil.buildErrorResponse
                     (null, statusCodes, "Authentication Failure, invalid username or password.", null));
-            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setAcsUrl(serviceProviderConfigs.getLoginPageURL());
+            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setAcsUrl(samlResponseHandlerConfig.getLoginPageURL());
             return builder;
         }
     }
@@ -158,7 +157,6 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
         }
         return false;
     }
-
 
 
     public String getName() {

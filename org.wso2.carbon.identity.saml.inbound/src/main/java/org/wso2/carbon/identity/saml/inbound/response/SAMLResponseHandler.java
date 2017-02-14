@@ -30,7 +30,6 @@ import org.wso2.carbon.identity.saml.inbound.builders.assertion.SAMLAssertionBui
 import org.wso2.carbon.identity.saml.inbound.builders.encryption.DefaultSSOEncrypter;
 import org.wso2.carbon.identity.saml.inbound.builders.encryption.SSOEncrypter;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
-import org.wso2.carbon.identity.saml.inbound.model.SAMLSSOServiceProviderDO;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 
 import java.util.Properties;
@@ -65,7 +64,7 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
             builder) throws IdentityException {
 
         SAMLMessageContext messageContext = (SAMLMessageContext) context.getParameter(SAMLSSOConstants.SAMLContext);
-        SAMLSSOServiceProviderDO serviceProviderDO = messageContext.getSamlssoServiceProviderDO();
+        SAMLResponseHandlerConfig responseBuilderConfig = messageContext.getResponseHandlerConfig();
         if (log.isDebugEnabled()) {
             log.debug("Building SAML Response for the consumer '" + messageContext.getAssertionConsumerURL() + "'");
         }
@@ -86,10 +85,10 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
         String sessionId = "";
         Assertion assertion = buildSAMLAssertion(messageContext, notOnOrAfter, sessionId);
 
-        if (serviceProviderDO.isDoEnableEncryptedAssertion()) {
+        if (responseBuilderConfig.isDoEnableEncryptedAssertion()) {
 
             String domainName = messageContext.getTenantDomain();
-            String alias = serviceProviderDO.getCertAlias();
+            String alias = responseBuilderConfig.getCertAlias();
             // TODO
             if (alias != null) {
                 EncryptedAssertion encryptedAssertion = setEncryptedAssertion(assertion,
@@ -99,8 +98,8 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
         } else {
             response.getAssertions().add(assertion);
         }
-        if (serviceProviderDO.isDoSignResponse()) {
-            SAMLSSOUtil.setSignature(response, serviceProviderDO.getSigningAlgorithmUri(), serviceProviderDO
+        if (responseBuilderConfig.isDoSignResponse()) {
+            SAMLSSOUtil.setSignature(response, responseBuilderConfig.getSigningAlgorithmUri(), responseBuilderConfig
                     .getDigestAlgorithmUri(), new SignKeyDataHolder());
         }
         builder.setResponse(response);
@@ -152,7 +151,7 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
         return "SAML";
     }
 
-    protected void setSAMLResponseHandlerConfigs (AuthenticationContext authenticationContext) throws
+    protected void setSAMLResponseHandlerConfigs(AuthenticationContext authenticationContext) throws
             AuthenticationHandlerException {
         SAMLMessageContext messageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
         Properties samlValidatorProperties = getResponseBuilderConfigs(authenticationContext);

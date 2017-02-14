@@ -34,4 +34,16 @@ public class SAMLValidatorConfig {
     public boolean isIdPInitSSOEnabled(){
         return Boolean.parseBoolean((String) properties.get("idPInitSSOEnabled"));
     }
+
+    public boolean isDoValidateSignatureInRequests () {
+        return Boolean.parseBoolean((String) properties.get("doValidateSignatureInRequests"));
+    }
+
+    public String getDefaultAssertionConsumerUrl() {
+        return (String) properties.get("defaultAssertionConsumerUrl");
+    }
+
+    public String getAttributeConsumingServiceIndex() {
+        return (String) properties.get("attributeConsumingServiceIndex");
+    }
 }
