@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.identity.saml.inbound.validator;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
@@ -26,8 +27,11 @@ import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
 import org.wso2.carbon.identity.gateway.api.IdentityRequest;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.request.RequestHandlerException;
+import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
+import org.wso2.carbon.identity.saml.inbound.model.SAMLSSOServiceProviderDO;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdpInitRequest;
+import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 import org.wso2.carbon.identity.saml.inbound.validators.IdPInitSSOAuthnRequestValidator;
 
 import java.io.IOException;
@@ -51,13 +55,59 @@ public class IDPInitSAMLValidator extends SAMLValidator {
 
     @Override
     public FrameworkHandlerResponse validate(AuthenticationContext authenticationContext) throws RequestHandlerException {
+
         super.validate(authenticationContext);
         IdentityRequest identityRequest = authenticationContext.getIdentityRequest();
+
         if (!((SAMLIdpInitRequest) identityRequest).isLogout()) {
             try {
-                SAMLMessageContext messageContext = (SAMLMessageContext) authenticationContext.getParameter("SAMLContext");
+
+                SAMLMessageContext messageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
                 IdPInitSSOAuthnRequestValidator validator = new IdPInitSSOAuthnRequestValidator(messageContext);
+                String spEntityID = ((SAMLIdpInitRequest) messageContext.getIdentityRequest()).getSpEntityID();
+                authenticationContext.setUniqueId(spEntityID);
+                validateIssuer(authenticationContext);
                 if (validator.validate(null)) {
+                    SAMLSSOServiceProviderDO serviceProviderConfigs = SAMLSSOUtil.getServiceProviderConfig(messageContext);
+                    messageContext.setSamlssoServiceProviderDO(serviceProviderConfigs);
+
+                    if (serviceProviderConfigs == null) {
+                        String msg = "A Service Provider with the Issuer '" + messageContext.getIssuer() + "' is not " +
+                                "registered." + " Service Provider should be registered in advance.";
+                        if (log.isDebugEnabled()) {
+                            log.debug(msg);
+                        }
+                        throw new RequestHandlerException(msg);
+                    }
+
+                    if (!serviceProviderConfigs.isIdPInitSSOEnabled()) {
+                        String msg = "IdP initiated SSO not enabled for service provider '" + messageContext.getIssuer() + "'.";
+                        if (log.isDebugEnabled()) {
+                            log.debug(msg);
+                        }
+                        throw new RequestHandlerException(msg);
+                    }
+
+                    if (serviceProviderConfigs.isEnableAttributesByDefault() && serviceProviderConfigs
+                            .getAttributeConsumingServiceIndex() != null) {
+                        messageContext.setAttributeConsumingServiceIndex(Integer.parseInt(serviceProviderConfigs
+                                .getAttributeConsumingServiceIndex()));
+                    }
+
+
+                    String acsUrl = StringUtils.isNotBlank(((SAMLIdpInitRequest) messageContext.getIdentityRequest()).getAcs()) ? (
+                            (SAMLIdpInitRequest) messageContext.getIdentityRequest()).getAcs() : serviceProviderConfigs
+                            .getDefaultAssertionConsumerUrl();
+                    if (StringUtils.isBlank(acsUrl) || !serviceProviderConfigs.getAssertionConsumerUrlList().contains
+                            (acsUrl)) {
+                        String msg = "ALERT: Invalid Assertion Consumer URL value '" + acsUrl + "' in the " +
+                                "AuthnRequest message from  the issuer '" + serviceProviderConfigs.getIssuer() +
+                                "'. Possibly " + "an attempt for a spoofing attack";
+                        if (log.isDebugEnabled()) {
+                            log.debug(msg);
+                        }
+                        throw new RequestHandlerException(msg);
+                    }
                     return FrameworkHandlerResponse.CONTINUE;
                 }
             } catch (IdentityException e) {

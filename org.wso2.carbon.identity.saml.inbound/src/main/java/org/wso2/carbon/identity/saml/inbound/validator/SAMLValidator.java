@@ -18,13 +18,18 @@
 package org.wso2.carbon.identity.saml.inbound.validator;
 
 
+import org.opensaml.saml2.core.AuthnRequest;
 import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
+import org.wso2.carbon.identity.gateway.processor.handler.authentication.AuthenticationHandlerException;
 import org.wso2.carbon.identity.gateway.processor.handler.request.AbstractRequestHandler;
 import org.wso2.carbon.identity.gateway.processor.handler.request.RequestHandlerException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdentityRequest;
+
+import java.util.Properties;
 
 public abstract class SAMLValidator extends AbstractRequestHandler {
 
@@ -39,6 +44,14 @@ public abstract class SAMLValidator extends AbstractRequestHandler {
     @Override
     protected String getValidatorType() {
         return "SAML";
+    }
+
+    protected void validateIssuer (AuthenticationContext authenticationContext) throws
+            AuthenticationHandlerException, RequestHandlerException {
+        SAMLMessageContext messageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
+        Properties samlValidatorProperties = getValidatorConfig(authenticationContext);
+        SAMLValidatorConfig samlValidatorConfig = new SAMLValidatorConfig(samlValidatorProperties);
+        messageContext.setSamlValidatorConfig(samlValidatorConfig);
     }
 
 }

@@ -23,17 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.common.base.message.MessageContext;
-import org.wso2.carbon.identity.common.internal.handler.HandlerConfig;
-import org.wso2.carbon.identity.common.internal.handler.HandlerConfigKey;
-import org.wso2.carbon.identity.common.util.IdentityUtils;
 import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.request.RequestHandlerException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
-import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
-import org.wso2.carbon.identity.saml.inbound.request.SAMLIdentityRequest;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLSpInitRequest;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 import org.wso2.carbon.identity.saml.inbound.validators.SPInitSSOAuthnRequestValidator;
@@ -71,12 +66,8 @@ public class SPInitSAMLValidator extends SAMLValidator {
 
             if (request instanceof AuthnRequest) {
                 authenticationContext.setUniqueId(((AuthnRequest) request).getIssuer().getValue());
-                if(authenticationContext.getServiceProvider() == null) {
-                    throw new RequestHandlerException("Error while validating SAML request : No service provider " +
-                            "found with issuer : " + ((AuthnRequest) request).getIssuer().getValue());
-                }
                 SAMLMessageContext messageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
-
+                validateIssuer(authenticationContext);
                 messageContext.setDestination(((AuthnRequest) request).getDestination());
                 messageContext.setId(((AuthnRequest) request).getID());
                 messageContext.setAssertionConsumerUrl(((AuthnRequest) request).getAssertionConsumerServiceURL());
@@ -99,6 +90,6 @@ public class SPInitSAMLValidator extends SAMLValidator {
     }
 
     public int getPriority(MessageContext messageContext) {
-       return 10;
+        return 10;
     }
 }

@@ -15,10 +15,16 @@ import org.opensaml.saml2.core.impl.StatusMessageBuilder;
 import org.opensaml.xml.security.x509.X509Credential;
 import org.slf4j.Logger;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
+import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
+import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
+import org.wso2.carbon.identity.gateway.processor.handler.authentication.AuthenticationHandlerException;
 import org.wso2.carbon.identity.gateway.processor.handler.response.AbstractResponseHandler;
+import org.wso2.carbon.identity.gateway.processor.handler.response.ResponseException;
 import org.wso2.carbon.identity.saml.inbound.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLResponseHandlerConfig;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.builders.SignKeyDataHolder;
 import org.wso2.carbon.identity.saml.inbound.builders.assertion.DefaultSAMLAssertionBuilder;
 import org.wso2.carbon.identity.saml.inbound.builders.assertion.SAMLAssertionBuilder;
@@ -28,9 +34,23 @@ import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.model.SAMLSSOServiceProviderDO;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 
+import java.util.Properties;
+
 abstract public class SAMLResponseHandler extends AbstractResponseHandler {
 
     private static Logger log = org.slf4j.LoggerFactory.getLogger(SAMLSPInitResponseHandler.class);
+
+
+    @Override
+    public FrameworkHandlerResponse buildResponse(AuthenticationContext authenticationContext) throws ResponseException {
+        try {
+            setSAMLResponseHandlerConfigs(authenticationContext);
+        } catch (AuthenticationHandlerException e) {
+            throw new ResponseException("Error while getting response handler configurations");
+        }
+        return FrameworkHandlerResponse.REDIRECT;
+    }
+
 
     public String setResponse(IdentityMessageContext context, SAMLLoginResponse.SAMLLoginResponseBuilder
             builder) throws IdentityException {
@@ -117,5 +137,17 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
         SAMLAssertionBuilder samlAssertionBuilder = new DefaultSAMLAssertionBuilder();
         return samlAssertionBuilder.buildAssertion(context, notOnOrAfter, sessionId);
 
+    }
+
+    protected String getValidatorType() {
+        return "SAML";
+    }
+
+    protected void setSAMLResponseHandlerConfigs (AuthenticationContext authenticationContext) throws
+            AuthenticationHandlerException {
+        SAMLMessageContext messageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
+        Properties samlValidatorProperties = getResponseBuilderConfigs(authenticationContext);
+        SAMLResponseHandlerConfig samlResponseHandlerConfig = new SAMLResponseHandlerConfig(samlValidatorProperties);
+        messageContext.setResponseHandlerConfig(samlResponseHandlerConfig);
     }
 }

@@ -64,6 +64,7 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
     @Override
     public FrameworkHandlerResponse buildResponse(AuthenticationContext authenticationContext) throws ResponseException {
 
+        super.buildResponse(authenticationContext);
         FrameworkHandlerResponse response = FrameworkHandlerResponse.REDIRECT;
         SAMLResponse.SAMLResponseBuilder builder;
         SAMLMessageContext samlMessageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
@@ -126,53 +127,6 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
         messageContext.setSamlssoServiceProviderDO(serviceProviderConfigs);
         SAMLResponse.SAMLResponseBuilder builder;
 
-        if (serviceProviderConfigs == null) {
-            String msg = "A Service Provider with the Issuer '" + messageContext.getIssuer() + "' is not " +
-                    "registered." + " Service Provider should be registered in advance.";
-            if (log.isDebugEnabled()) {
-                log.debug(msg);
-            }
-            builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(messageContext);
-//            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setErrorResponse(buildErrorResponse
-//                    (null, SAMLSSOConstants.StatusCodes.REQUESTOR_ERROR, msg, null));
-            return builder;
-        }
-
-        if (!serviceProviderConfigs.isIdPInitSSOEnabled()) {
-            String msg = "IdP initiated SSO not enabled for service provider '" + messageContext.getIssuer() + "'.";
-            if (log.isDebugEnabled()) {
-                log.debug(msg);
-            }
-            builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(messageContext);
-//            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setErrorResponse(buildErrorResponse
-//                    (null, SAMLSSOConstants.StatusCodes.REQUESTOR_ERROR, msg, null));
-            return builder;
-        }
-
-        if (serviceProviderConfigs.isEnableAttributesByDefault() && serviceProviderConfigs
-                .getAttributeConsumingServiceIndex() != null) {
-            messageContext.setAttributeConsumingServiceIndex(Integer.parseInt(serviceProviderConfigs
-                    .getAttributeConsumingServiceIndex()));
-        }
-
-
-        String acsUrl = StringUtils.isNotBlank(((SAMLIdpInitRequest) messageContext.getIdentityRequest()).getAcs()) ? (
-                (SAMLIdpInitRequest) messageContext.getIdentityRequest()).getAcs() : serviceProviderConfigs
-                .getDefaultAssertionConsumerUrl();
-        if (StringUtils.isBlank(acsUrl) || !serviceProviderConfigs.getAssertionConsumerUrlList().contains
-                (acsUrl)) {
-            String msg = "ALERT: Invalid Assertion Consumer URL value '" + acsUrl + "' in the " +
-                    "AuthnRequest message from  the issuer '" + serviceProviderConfigs.getIssuer() +
-                    "'. Possibly " + "an attempt for a spoofing attack";
-            if (log.isDebugEnabled()) {
-                log.debug(msg);
-            }
-            builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(messageContext);
-//            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setErrorResponse(buildErrorResponse
-//                    (null, SAMLSSOConstants.StatusCodes.REQUESTOR_ERROR, msg, acsUrl));
-            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setAcsUrl(acsUrl);
-            return builder;
-        }
         // TODO : persist the session
         if (isAuthenticated) {
             builder = new SAMLLoginResponse.SAMLLoginResponseBuilder(authenticationContext);
