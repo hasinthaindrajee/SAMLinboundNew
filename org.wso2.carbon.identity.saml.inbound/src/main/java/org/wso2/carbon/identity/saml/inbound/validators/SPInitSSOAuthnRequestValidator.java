@@ -30,15 +30,15 @@ import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.request.RequestHandlerException;
-import org.wso2.carbon.identity.saml.inbound.bean.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
-import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLValidatorConfig;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.builders.signature.DefaultSSOSigner;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.exception.IdentitySAML2SSOException;
 import org.wso2.carbon.identity.saml.inbound.exception.SAML2ClientException;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLSpInitRequest;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
+import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLValidatorConfig;
 
 import java.io.IOException;
 import java.util.List;
@@ -156,7 +156,6 @@ public class SPInitSSOAuthnRequestValidator {
                     .REQUESTOR_ERROR, "Subject Confirmation " + "methods should NOT be in the request.", authnReq
                     .getAssertionConsumerServiceURL()));
         }
-        messageContext.setValid(true);
         messageContext.addParameter("forceAuth", authnReq.isForceAuthn());
         messageContext.addParameter("passiveAuth", authnReq.isPassive());
         Integer index = authnReq.getAttributeConsumingServiceIndex();
@@ -167,14 +166,7 @@ public class SPInitSSOAuthnRequestValidator {
         if (log.isDebugEnabled()) {
             log.debug("Authentication Request Validation is successful.");
         }
-        validateFurther(authnReq);
-        messageContext.setValid(true);
-        return true;
-    }
 
-
-    private boolean validateFurther(AuthnRequest authnReq) throws IOException, IdentityException {
-        SAMLValidatorConfig samlValidatorConfig = messageContext.getSamlValidatorConfig();
         if (samlValidatorConfig.isDoValidateSignatureInRequests()) {
             // TODO
             List<String> idpUrlSet = SAMLConfigurations.getInstance().getDestinationUrls();
@@ -198,25 +190,27 @@ public class SPInitSSOAuthnRequestValidator {
                 if (log.isDebugEnabled()) {
                     log.debug(msg);
                 }
+                messageContext.setValid(false);
                 throw SAML2ClientException.error(SAMLSSOUtil.buildErrorResponse(SAMLSSOConstants.StatusCodes
                         .REQUESTOR_ERROR, msg, authnReq.getAssertionConsumerServiceURL()));
             }
         } else {
             //Validate the assertion consumer url,  only if request is not signed.
-            String acsUrl = messageContext.getAssertionConsumerURL();
-            if (StringUtils.isBlank(acsUrl) || !samlValidatorConfig.getAssertionConsumerUrlList().contains
-                    (acsUrl)) {
-                String msg = "ALERT: Invalid Assertion Consumer URL value '" + acsUrl + "' in the " +
+            String acsUrlFromMessageContext = messageContext.getAssertionConsumerURL();
+            if (StringUtils.isBlank(acsUrlFromMessageContext) || !samlValidatorConfig.getAssertionConsumerUrlList().contains
+                    (acsUrlFromMessageContext)) {
+                String msg = "ALERT: Invalid Assertion Consumer URL value '" + acsUrlFromMessageContext + "' in the " +
                         "AuthnRequest message from  the issuer '" + samlValidatorConfig.getIssuer() +
                         "'. Possibly " + "an attempt for a spoofing attack";
                 if (log.isDebugEnabled()) {
                     log.debug(msg);
                 }
+                messageContext.setValid(false);
                 throw SAML2ClientException.error(SAMLSSOUtil.buildErrorResponse(SAMLSSOConstants.StatusCodes
                         .REQUESTOR_ERROR, msg, authnReq.getAssertionConsumerServiceURL()));
             }
         }
-
+        messageContext.setValid(true);
         return true;
     }
 
