@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.identity.saml.inbound.context;
 
-import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
+import org.wso2.carbon.identity.gateway.api.context.IdentityMessageContext;
 import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLResponseHandlerConfig;
 import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdentityRequest;

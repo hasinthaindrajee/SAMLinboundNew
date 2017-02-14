@@ -16,8 +16,8 @@ public class SAMLIdentityRequest extends ClientAuthenticationRequest {
     private static Logger log = LoggerFactory.getLogger(SAMLIdentityRequest.class);
 
 
-    public SAMLIdentityRequest(SAMLIdentityRequestBuilder builder, String uniqueId, String type) {
-        super(builder, uniqueId, type);
+    public SAMLIdentityRequest(SAMLIdentityRequestBuilder builder) {
+        super(builder);
     }
 
     public String getRelayState() {

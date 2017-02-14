@@ -23,8 +23,8 @@ import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.msf4j.Request;
 
 public class SAMLIdpInitRequest extends SAMLIdentityRequest {
-    public SAMLIdpInitRequest(SAMLIdpInitRequestBuilder builder, String uniqueId) {
-        super(builder, uniqueId, "samlIDPinit");
+    public SAMLIdpInitRequest(SAMLIdpInitRequestBuilder builder) {
+        super(builder);
     }
 
     public String getSpEntityID() {
@@ -56,7 +56,7 @@ public class SAMLIdpInitRequest extends SAMLIdentityRequest {
         }
         @Override
         public SAMLIdpInitRequest build() {
-            return new SAMLIdpInitRequest(this, "SAMLIdpInitRequest");
+            return new SAMLIdpInitRequest(this);
         }
 
 

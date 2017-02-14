@@ -1,7 +1,7 @@
 package org.wso2.carbon.identity.saml.inbound.exception;
 
-import org.wso2.carbon.identity.gateway.api.FrameworkRuntimeException;
 
+import org.wso2.carbon.identity.gateway.api.exception.FrameworkRuntimeException;
 
 public class SAMLRuntimeException extends FrameworkRuntimeException {
     protected SAMLRuntimeException(String errorDescription) {

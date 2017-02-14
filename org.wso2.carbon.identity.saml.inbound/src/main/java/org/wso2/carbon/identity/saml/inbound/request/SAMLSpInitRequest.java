@@ -29,8 +29,8 @@ public class SAMLSpInitRequest extends SAMLIdentityRequest {
 
     private static Logger log = LoggerFactory.getLogger(SAMLSpInitRequest.class);
 
-    public SAMLSpInitRequest(SAMLSpInitRequestBuilder builder, String uniqueId) {
-        super(builder, uniqueId, "samlSPinit");
+    public SAMLSpInitRequest(SAMLSpInitRequestBuilder builder) {
+        super(builder);
     }
 
     public String getSignature() {
@@ -88,7 +88,7 @@ public class SAMLSpInitRequest extends SAMLIdentityRequest {
 
         @Override
         public SAMLSpInitRequest build() {
-            return new SAMLSpInitRequest(this, "");
+            return new SAMLSpInitRequest(this);
         }
     }
 }
