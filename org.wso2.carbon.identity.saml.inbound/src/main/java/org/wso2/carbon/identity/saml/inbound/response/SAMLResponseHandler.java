@@ -15,8 +15,8 @@ import org.opensaml.saml2.core.impl.StatusMessageBuilder;
 import org.opensaml.xml.security.x509.X509Credential;
 import org.slf4j.Logger;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
-import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
-import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
+import org.wso2.carbon.identity.gateway.api.context.IdentityMessageContext;
+import org.wso2.carbon.identity.gateway.api.response.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.authentication.AuthenticationHandlerException;
 import org.wso2.carbon.identity.gateway.processor.handler.response.AbstractResponseHandler;
@@ -38,12 +38,12 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
 
     private static Logger log = org.slf4j.LoggerFactory.getLogger(SAMLSPInitResponseHandler.class);
 
-
     @Override
-    public FrameworkHandlerResponse buildErrorResponse(AuthenticationContext authenticationContext) throws ResponseException {
+    public FrameworkHandlerResponse buildErrorResponse(AuthenticationContext authenticationContext, IdentityException e) throws
+                                                                                                     ResponseException {
         try {
             setSAMLResponseHandlerConfigs(authenticationContext);
-        } catch (AuthenticationHandlerException e) {
+        } catch (AuthenticationHandlerException ex) {
             throw new ResponseException("Error while getting response handler configurations");
         }
         return FrameworkHandlerResponse.REDIRECT;

@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.saml.inbound.exception;
 
 
-import org.wso2.carbon.identity.gateway.api.FrameworkClientException;
+import org.wso2.carbon.identity.gateway.api.exception.FrameworkClientException;
 
 public class SAML2ClientException extends FrameworkClientException{
 

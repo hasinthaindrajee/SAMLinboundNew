@@ -3,7 +3,7 @@ package org.wso2.carbon.identity.saml.inbound.response;
 import org.slf4j.Logger;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.common.base.message.MessageContext;
-import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
+import org.wso2.carbon.identity.gateway.api.response.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.response.ResponseException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
@@ -19,9 +19,10 @@ public class SAMLSPInitResponseHandler extends SAMLResponseHandler {
     private static Logger log = org.slf4j.LoggerFactory.getLogger(SAMLSPInitResponseHandler.class);
 
     @Override
-    public FrameworkHandlerResponse buildErrorResponse(AuthenticationContext authenticationContext) throws ResponseException {
+    public FrameworkHandlerResponse buildErrorResponse(AuthenticationContext authenticationContext, IdentityException e) throws
+                                                                                                     ResponseException {
 
-        super.buildErrorResponse(authenticationContext);
+        super.buildErrorResponse(authenticationContext, e);
         SAMLMessageContext samlMessageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
         SAMLResponse.SAMLResponseBuilder builder;
         FrameworkHandlerResponse response = FrameworkHandlerResponse.REDIRECT;
@@ -47,8 +48,8 @@ public class SAMLSPInitResponseHandler extends SAMLResponseHandler {
                 ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setTenantDomain(samlMessageContext
                         .getTenantDomain());
                 response.setIdentityResponseBuilder(builder);
-            } catch (IdentityException e) {
-                e.printStackTrace();
+            } catch (IdentityException ex) {
+                ex.printStackTrace();
             }
         }
 

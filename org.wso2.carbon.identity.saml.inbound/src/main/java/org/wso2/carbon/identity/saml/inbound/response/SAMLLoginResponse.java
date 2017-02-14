@@ -26,8 +26,8 @@ import org.opensaml.saml2.core.impl.StatusCodeBuilder;
 import org.opensaml.saml2.core.impl.StatusMessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
-import org.wso2.carbon.identity.gateway.api.IdentityResponse;
+import org.wso2.carbon.identity.gateway.api.context.IdentityMessageContext;
+import org.wso2.carbon.identity.gateway.api.response.IdentityResponse;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 
 public class SAMLLoginResponse extends SAMLResponse {
@@ -39,7 +39,7 @@ public class SAMLLoginResponse extends SAMLResponse {
     private String authenticatedIdPs;
     private String tenantDomain;
 
-    protected SAMLLoginResponse(IdentityResponseBuilder builder) {
+    protected SAMLLoginResponse(IdentityResponse.IdentityResponseBuilder builder) {
         super(builder);
         this.respString = ((SAMLLoginResponseBuilder) builder).respString;
         this.relayState = ((SAMLLoginResponseBuilder) builder).relayState;

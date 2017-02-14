@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.identity.saml.inbound.response;
 
-import org.wso2.carbon.identity.gateway.api.IdentityMessageContext;
-import org.wso2.carbon.identity.gateway.api.IdentityResponse;
+import org.wso2.carbon.identity.gateway.api.context.IdentityMessageContext;
+import org.wso2.carbon.identity.gateway.api.response.IdentityResponse;
 
 public class SAMLErrorResponse extends SAMLResponse {
 

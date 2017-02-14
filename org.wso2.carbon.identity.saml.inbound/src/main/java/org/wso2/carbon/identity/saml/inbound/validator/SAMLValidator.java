@@ -17,8 +17,7 @@
  */
 package org.wso2.carbon.identity.saml.inbound.validator;
 
-
-import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
+import org.wso2.carbon.identity.gateway.api.response.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.authentication.AuthenticationHandlerException;
 import org.wso2.carbon.identity.gateway.processor.handler.request.AbstractRequestHandler;
