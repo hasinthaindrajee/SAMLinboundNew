@@ -24,6 +24,7 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
     @Override
     public FrameworkHandlerResponse buildErrorResponse(AuthenticationContext authenticationContext) throws ResponseException {
 
+        super.buildErrorResponse(authenticationContext);
         FrameworkHandlerResponse response = FrameworkHandlerResponse.REDIRECT;
         SAMLMessageContext samlMessageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
         SAMLResponse.SAMLResponseBuilder builder;
@@ -70,7 +71,7 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
         SAMLMessageContext samlMessageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
 
 
-        String relayState = (String) authenticationContext.getIdentityRequest().getParameter(SAMLSSOConstants.RELAY_STATE);
+        String relayState = authenticationContext.getIdentityRequest().getParameter(SAMLSSOConstants.RELAY_STATE);
         if (StringUtils.isBlank(relayState)) {
             relayState = samlMessageContext.getRelayState();
         }

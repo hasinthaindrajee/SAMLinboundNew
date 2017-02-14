@@ -15,6 +15,7 @@ public class SAMLSPInitResponseHandler extends SAMLResponseHandler {
     @Override
     public FrameworkHandlerResponse buildErrorResponse(AuthenticationContext authenticationContext) throws ResponseException {
 
+        super.buildErrorResponse(authenticationContext);
         SAMLResponse.SAMLResponseBuilder builder;
         FrameworkHandlerResponse response = FrameworkHandlerResponse.REDIRECT;
         builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(authenticationContext);
@@ -29,7 +30,7 @@ public class SAMLSPInitResponseHandler extends SAMLResponseHandler {
 
     @Override
     public FrameworkHandlerResponse buildResponse(AuthenticationContext authenticationContext) throws ResponseException {
-         super.buildResponse(authenticationContext);
+        super.buildResponse(authenticationContext);
         // TODO
 
 //        if (identityMessageContext.getSubject() != null && messageContext.getUser() != null) {

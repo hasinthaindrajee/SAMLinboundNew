@@ -46,7 +46,7 @@ public abstract class SAMLValidator extends AbstractRequestHandler {
         return "SAML";
     }
 
-    protected void validateIssuer (AuthenticationContext authenticationContext) throws
+    protected void validateServiceProvider (AuthenticationContext authenticationContext) throws
             AuthenticationHandlerException, RequestHandlerException {
         SAMLMessageContext messageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
         Properties samlValidatorProperties = getValidatorConfig(authenticationContext);

@@ -67,7 +67,8 @@ public class SPInitSAMLValidator extends SAMLValidator {
             if (request instanceof AuthnRequest) {
                 authenticationContext.setUniqueId(((AuthnRequest) request).getIssuer().getValue());
                 SAMLMessageContext messageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
-                validateIssuer(authenticationContext);
+                validateServiceProvider(authenticationContext);
+                messageContext.getSamlValidatorConfig().getAssertionConsumerUrlList();
                 messageContext.setDestination(((AuthnRequest) request).getDestination());
                 messageContext.setId(((AuthnRequest) request).getID());
                 messageContext.setAssertionConsumerUrl(((AuthnRequest) request).getAssertionConsumerServiceURL());

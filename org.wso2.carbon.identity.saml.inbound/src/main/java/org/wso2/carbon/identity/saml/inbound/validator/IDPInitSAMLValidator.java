@@ -66,7 +66,7 @@ public class IDPInitSAMLValidator extends SAMLValidator {
                 IdPInitSSOAuthnRequestValidator validator = new IdPInitSSOAuthnRequestValidator(messageContext);
                 String spEntityID = ((SAMLIdpInitRequest) messageContext.getIdentityRequest()).getSpEntityID();
                 authenticationContext.setUniqueId(spEntityID);
-                validateIssuer(authenticationContext);
+                validateServiceProvider(authenticationContext);
                 if (validator.validate(null)) {
                     SAMLSSOServiceProviderDO serviceProviderConfigs = SAMLSSOUtil.getServiceProviderConfig(messageContext);
                     messageContext.setSamlssoServiceProviderDO(serviceProviderConfigs);

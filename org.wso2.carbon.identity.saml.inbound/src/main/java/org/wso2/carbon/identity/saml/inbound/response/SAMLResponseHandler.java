@@ -24,7 +24,6 @@ import org.wso2.carbon.identity.gateway.processor.handler.response.ResponseExcep
 import org.wso2.carbon.identity.saml.inbound.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.carbon.identity.saml.inbound.bean.SAMLResponseHandlerConfig;
-import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.builders.SignKeyDataHolder;
 import org.wso2.carbon.identity.saml.inbound.builders.assertion.DefaultSAMLAssertionBuilder;
 import org.wso2.carbon.identity.saml.inbound.builders.assertion.SAMLAssertionBuilder;
@@ -40,6 +39,16 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
 
     private static Logger log = org.slf4j.LoggerFactory.getLogger(SAMLSPInitResponseHandler.class);
 
+
+    @Override
+    public FrameworkHandlerResponse buildErrorResponse(AuthenticationContext authenticationContext) throws ResponseException {
+        try {
+            setSAMLResponseHandlerConfigs(authenticationContext);
+        } catch (AuthenticationHandlerException e) {
+            throw new ResponseException("Error while getting response handler configurations");
+        }
+        return FrameworkHandlerResponse.REDIRECT;
+    }
 
     @Override
     public FrameworkHandlerResponse buildResponse(AuthenticationContext authenticationContext) throws ResponseException {

@@ -1,5 +1,7 @@
 package org.wso2.carbon.identity.saml.inbound.bean;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class SAMLValidatorConfig {
@@ -8,5 +10,28 @@ public class SAMLValidatorConfig {
 
     public SAMLValidatorConfig(Properties properties) {
         this.properties = properties;
+    }
+
+    public List<String> getAssertionConsumerUrlList() {
+        List assertionConsumerUrls = (List) this.properties.get("assertionConsumerUrls");
+        List<String> assertionConsumerUrlStrings = new ArrayList<String>();
+        assertionConsumerUrls.stream().forEach(a -> assertionConsumerUrlStrings.add((String)a));
+        return assertionConsumerUrlStrings;
+    }
+
+    public String getIssuer() {
+        return (String) properties.get("issuer");
+    }
+
+    public String getCertAlias() {
+        return (String) properties.get("certificateAlias");
+    }
+
+    public boolean isEnableAttributesByDefault() {
+        return Boolean.parseBoolean((String) properties.get("enableAttributesByDefault"));
+    }
+
+    public boolean isIdPInitSSOEnabled(){
+        return Boolean.parseBoolean((String) properties.get("idPInitSSOEnabled"));
     }
 }
