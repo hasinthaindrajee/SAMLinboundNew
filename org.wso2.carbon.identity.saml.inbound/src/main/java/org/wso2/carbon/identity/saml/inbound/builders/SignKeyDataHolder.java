@@ -25,7 +25,7 @@ import org.opensaml.xml.security.credential.UsageType;
 import org.opensaml.xml.security.x509.X509Credential;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.saml.inbound.KeyStoreManager;
-import org.wso2.carbon.identity.saml.inbound.SAMLConfigurations;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLConfigurations;
 
 import javax.crypto.SecretKey;
 import java.security.PrivateKey;

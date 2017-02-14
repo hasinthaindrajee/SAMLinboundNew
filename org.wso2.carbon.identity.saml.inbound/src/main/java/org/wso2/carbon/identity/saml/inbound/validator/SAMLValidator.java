@@ -18,14 +18,13 @@
 package org.wso2.carbon.identity.saml.inbound.validator;
 
 
-import org.opensaml.saml2.core.AuthnRequest;
 import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.authentication.AuthenticationHandlerException;
 import org.wso2.carbon.identity.gateway.processor.handler.request.AbstractRequestHandler;
 import org.wso2.carbon.identity.gateway.processor.handler.request.RequestHandlerException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
-import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
+import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdentityRequest;
 

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.gateway.api.HttpIdentityResponse;
 import org.wso2.carbon.identity.gateway.api.HttpIdentityResponseFactory;
 import org.wso2.carbon.identity.gateway.api.IdentityResponse;
-import org.wso2.carbon.identity.saml.inbound.SAMLConfigurations;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
 

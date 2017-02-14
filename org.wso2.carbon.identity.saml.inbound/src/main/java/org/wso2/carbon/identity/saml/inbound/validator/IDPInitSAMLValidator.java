@@ -28,7 +28,7 @@ import org.wso2.carbon.identity.gateway.api.IdentityRequest;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.request.RequestHandlerException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
-import org.wso2.carbon.identity.saml.inbound.bean.SAMLValidatorConfig;
+import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLValidatorConfig;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdpInitRequest;
 import org.wso2.carbon.identity.saml.inbound.validators.IdPInitSSOAuthnRequestValidator;

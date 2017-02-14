@@ -6,7 +6,13 @@ import org.wso2.carbon.identity.common.base.message.MessageContext;
 import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.response.ResponseException;
+import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
+import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLSpInitRequest;
+import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SAMLSPInitResponseHandler extends SAMLResponseHandler {
 
@@ -16,8 +22,37 @@ public class SAMLSPInitResponseHandler extends SAMLResponseHandler {
     public FrameworkHandlerResponse buildErrorResponse(AuthenticationContext authenticationContext) throws ResponseException {
 
         super.buildErrorResponse(authenticationContext);
+        SAMLMessageContext samlMessageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
         SAMLResponse.SAMLResponseBuilder builder;
         FrameworkHandlerResponse response = FrameworkHandlerResponse.REDIRECT;
+
+        if (samlMessageContext.isPassive()) { //if passive
+            String destination = samlMessageContext.getAssertionConsumerURL();
+            List<String> statusCodes = new ArrayList<String>();
+            statusCodes.add(SAMLSSOConstants.StatusCodes.NO_PASSIVE);
+            statusCodes.add(SAMLSSOConstants.StatusCodes.IDENTITY_PROVIDER_ERROR);
+            String errorResponse = null;
+            try {
+                errorResponse = SAMLSSOUtil.buildErrorResponse(samlMessageContext.getId(), statusCodes,
+                        "Cannot process response from framework Subject in Passive Mode", destination);
+
+                builder = new SAMLLoginResponse.SAMLLoginResponseBuilder(samlMessageContext);
+                ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setRelayState(samlMessageContext.getRelayState
+                        ());
+                ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setRespString(errorResponse);
+                ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setAcsUrl(samlMessageContext
+                        .getAssertionConsumerURL());
+                ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setSubject(samlMessageContext.getSubject());
+                ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setAuthenticatedIdPs(null);
+                ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setTenantDomain(samlMessageContext
+                        .getTenantDomain());
+                response.setIdentityResponseBuilder(builder);
+            } catch (IdentityException e) {
+                e.printStackTrace();
+            }
+        }
+
+
         builder = new SAMLErrorResponse.SAMLErrorResponseBuilder(authenticationContext);
         // TODO
 //            ((SAMLErrorResponse.SAMLErrorResponseBuilder) builder).setErrorResponse(buildErrorResponse

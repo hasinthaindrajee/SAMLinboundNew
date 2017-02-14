@@ -56,7 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
-import org.wso2.carbon.identity.saml.inbound.bean.SAMLResponseHandlerConfig;
+import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLResponseHandlerConfig;
 import org.wso2.carbon.identity.saml.inbound.builders.SignKeyDataHolder;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;

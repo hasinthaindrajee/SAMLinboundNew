@@ -1,4 +1,4 @@
-package org.wso2.carbon.identity.saml.inbound;
+package org.wso2.carbon.identity.saml.inbound.bean;
 
 import java.util.ArrayList;
 import java.util.List;

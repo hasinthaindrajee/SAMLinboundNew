@@ -1,6 +1,7 @@
 package org.wso2.carbon.identity.saml.inbound;
 
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLConfigurations;
 
 import java.io.FileInputStream;
 import java.io.IOException;

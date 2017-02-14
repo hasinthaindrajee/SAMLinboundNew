@@ -8,7 +8,7 @@ import org.wso2.carbon.identity.gateway.api.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.response.ResponseException;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
-import org.wso2.carbon.identity.saml.inbound.bean.SAMLResponseHandlerConfig;
+import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLResponseHandlerConfig;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.request.SAMLIdpInitRequest;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
