@@ -99,7 +99,7 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
             ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setRelayState(relayState);
             ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setAcsUrl(samlMessageContext
                     .getAssertionConsumerURL());
-            ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setSubject("admin");
+            ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setSubject(SAMLSSOUtil.getSubject(authenticationContext));
 //                ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setAuthenticatedIdPs(samlMessageContext
 //                        .getAuthenticationResult().getAuthenticatedIdPs());
             ((SAMLLoginResponse.SAMLLoginResponseBuilder) builder).setTenantDomain(samlMessageContext

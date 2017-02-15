@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.saml.inbound.builders.assertion;
 import org.joda.time.DateTime;
 import org.opensaml.saml2.core.Assertion;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
+import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 
 public interface SAMLAssertionBuilder {
@@ -37,7 +38,7 @@ public interface SAMLAssertionBuilder {
      * @throws IdentityException
      */
 
-    public Assertion buildAssertion(SAMLMessageContext context, DateTime notOnOrAfter,
+    public Assertion buildAssertion(AuthenticationContext context, DateTime notOnOrAfter,
                                     String sessionId) throws IdentityException;
 
 }

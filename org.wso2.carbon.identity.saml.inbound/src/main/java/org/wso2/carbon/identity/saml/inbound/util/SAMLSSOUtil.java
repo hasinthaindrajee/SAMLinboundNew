@@ -57,16 +57,19 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
+import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
+import org.wso2.carbon.identity.mgt.claim.Claim;
 import org.wso2.carbon.identity.saml.inbound.KeyStoreManager;
-import org.wso2.carbon.identity.saml.inbound.bean.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
-import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLResponseHandlerConfig;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.builders.X509CredentialImpl;
 import org.wso2.carbon.identity.saml.inbound.builders.signature.DefaultSSOSigner;
 import org.wso2.carbon.identity.saml.inbound.builders.signature.SSOSigner;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.exception.IdentitySAML2SSOException;
+import org.wso2.carbon.identity.saml.inbound.internal.SAMLInboundServiceDataHolder;
 import org.wso2.carbon.identity.saml.inbound.validators.SAML2HTTPRedirectSignatureValidator;
+import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLResponseHandlerConfig;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -85,6 +88,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -793,14 +798,16 @@ public class SAMLSSOUtil {
      * @return Map with attributes and values
      * @throws IdentityException
      */
-    public static Map<String, String> getAttributes(SAMLMessageContext context
+    public static Map<String, String> getAttributes(AuthenticationContext authenticationContext
     ) throws IdentityException {
 
         int index = 0;
-        SAMLResponseHandlerConfig samlResponseHandlerConfig = context.getResponseHandlerConfig();
-        if (!context.isIdpInitSSO()) {
+        SAMLMessageContext samlMessageContext = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants.SAMLContext);
 
-            if (context.getAttributeConsumingServiceIndex() == 0) {
+        SAMLResponseHandlerConfig samlResponseHandlerConfig = samlMessageContext.getResponseHandlerConfig();
+        if (!samlMessageContext.isIdpInitSSO()) {
+
+            if (samlMessageContext.getAttributeConsumingServiceIndex() == 0) {
                 //SP has not provide a AttributeConsumingServiceIndex in the authnReqDTO
                 if (StringUtils.isNotBlank(samlResponseHandlerConfig.getAttributeConsumingServiceIndex()) &&
                         samlResponseHandlerConfig.isEnableAttributesByDefault()) {
@@ -810,7 +817,7 @@ public class SAMLSSOUtil {
                 }
             } else {
                 //SP has provide a AttributeConsumingServiceIndex in the authnReqDTO
-                index = context.getAttributeConsumingServiceIndex();
+                index = samlMessageContext.getAttributeConsumingServiceIndex();
             }
         } else {
             if (StringUtils.isNotBlank(samlResponseHandlerConfig.getAttributeConsumingServiceIndex()) &&
@@ -837,14 +844,19 @@ public class SAMLSSOUtil {
         }
 
         Map<String, String> claimsMap = new HashMap<String, String>();
-        // TODO
-//        if (context.getAuthenticationResult().getSubject().getUserAttributes() != null) {
-//            for (Map.Entry<ClaimMapping, String> entry : context.getAuthenticationResult().getSubject()
-//                    .getUserAttributes().entrySet()) {
-//                claimsMap.put(entry.getKey().getRemoteClaim().getClaimUri(), entry.getValue());
-//            }
-//        }
-        claimsMap.put("org.wso2.test", "somevaluehere");
+        Set<Claim> aggregatedClaims = authenticationContext.getSequenceContext().getAllClaims();
+        String profileName = authenticationContext.getServiceProvider().getClaimConfig().getProfile();
+        String dialect = authenticationContext.getServiceProvider().getClaimConfig().getDialectUri();
+
+        if (StringUtils.isEmpty(dialect)) {
+            dialect = "defaultDialect";
+        }
+
+        aggregatedClaims = SAMLInboundServiceDataHolder.getInstance()
+                .getGatewayClaimResolverService().transformToOtherDialect(aggregatedClaims, dialect, Optional
+                        .of(profileName));
+
+        aggregatedClaims.stream().forEach(claim -> claimsMap.put(claim.getClaimUri(), claim.getValue()));
         return claimsMap;
     }
 
@@ -864,5 +876,13 @@ public class SAMLSSOUtil {
         SAMLSSOUtil.singleLogoutRetryInterval = singleLogoutRetryInterval;
     }
 
-
+    // TODO fix this to get proper subject
+    public static String getSubject(AuthenticationContext authenticationContext) {
+        if (authenticationContext.getSequenceContext() != null && authenticationContext.getSequenceContext()
+                .getStepContext(0) != null && authenticationContext.getSequenceContext().getStepContext(0).getUser()
+                != null) {
+            return authenticationContext.getSequenceContext().getStepContext(0).getUser().getUserIdentifier();
+        }
+        return "testuser";
+    }
 }

@@ -15,15 +15,13 @@ import org.opensaml.saml2.core.impl.StatusMessageBuilder;
 import org.opensaml.xml.security.x509.X509Credential;
 import org.slf4j.Logger;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
-import org.wso2.carbon.identity.gateway.api.context.IdentityMessageContext;
 import org.wso2.carbon.identity.gateway.api.response.FrameworkHandlerResponse;
 import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.gateway.processor.handler.authentication.AuthenticationHandlerException;
 import org.wso2.carbon.identity.gateway.processor.handler.response.AbstractResponseHandler;
 import org.wso2.carbon.identity.gateway.processor.handler.response.ResponseException;
-import org.wso2.carbon.identity.saml.inbound.bean.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
-import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLResponseHandlerConfig;
+import org.wso2.carbon.identity.saml.inbound.bean.SAMLConfigurations;
 import org.wso2.carbon.identity.saml.inbound.builders.SignKeyDataHolder;
 import org.wso2.carbon.identity.saml.inbound.builders.assertion.DefaultSAMLAssertionBuilder;
 import org.wso2.carbon.identity.saml.inbound.builders.assertion.SAMLAssertionBuilder;
@@ -31,6 +29,7 @@ import org.wso2.carbon.identity.saml.inbound.builders.encryption.DefaultSSOEncry
 import org.wso2.carbon.identity.saml.inbound.builders.encryption.SSOEncrypter;
 import org.wso2.carbon.identity.saml.inbound.context.SAMLMessageContext;
 import org.wso2.carbon.identity.saml.inbound.util.SAMLSSOUtil;
+import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLResponseHandlerConfig;
 
 import java.util.Properties;
 
@@ -40,7 +39,7 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
 
     @Override
     public FrameworkHandlerResponse buildErrorResponse(AuthenticationContext authenticationContext, IdentityException e) throws
-                                                                                                     ResponseException {
+            ResponseException {
         try {
             setSAMLResponseHandlerConfigs(authenticationContext);
         } catch (AuthenticationHandlerException ex) {
@@ -60,7 +59,7 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
     }
 
 
-    public String setResponse(IdentityMessageContext context, SAMLLoginResponse.SAMLLoginResponseBuilder
+    public String setResponse(AuthenticationContext context, SAMLLoginResponse.SAMLLoginResponseBuilder
             builder) throws IdentityException {
 
         SAMLMessageContext messageContext = (SAMLMessageContext) context.getParameter(SAMLSSOConstants.SAMLContext);
@@ -83,7 +82,7 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
         response.setIssueInstant(issueInstant);
         //@TODO sessionHandling
         String sessionId = "";
-        Assertion assertion = buildSAMLAssertion(messageContext, notOnOrAfter, sessionId);
+        Assertion assertion = buildSAMLAssertion(context, notOnOrAfter, sessionId);
 
         if (responseBuilderConfig.isDoEnableEncryptedAssertion()) {
 
@@ -139,7 +138,7 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
         return ssoEncrypter.doEncryptedAssertion(assertion, cred, alias, encryptionAlgorithm);
     }
 
-    public Assertion buildSAMLAssertion(SAMLMessageContext context, DateTime notOnOrAfter,
+    public Assertion buildSAMLAssertion(AuthenticationContext context, DateTime notOnOrAfter,
                                         String sessionId) throws IdentityException {
         SAMLSSOUtil.doBootstrap();
         SAMLAssertionBuilder samlAssertionBuilder = new DefaultSAMLAssertionBuilder();

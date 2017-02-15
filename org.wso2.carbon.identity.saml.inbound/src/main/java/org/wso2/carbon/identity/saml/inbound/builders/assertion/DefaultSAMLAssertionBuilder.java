@@ -55,6 +55,7 @@ import org.opensaml.xml.schema.impl.XSStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.identity.common.base.exception.IdentityException;
+import org.wso2.carbon.identity.gateway.context.AuthenticationContext;
 import org.wso2.carbon.identity.saml.inbound.SAMLSSOConstants;
 import org.wso2.carbon.identity.saml.inbound.wrapper.SAMLResponseHandlerConfig;
 import org.wso2.carbon.identity.saml.inbound.builders.SignKeyDataHolder;
@@ -80,12 +81,12 @@ public class DefaultSAMLAssertionBuilder implements SAMLAssertionBuilder {
     }
 
 
-    public Assertion buildAssertion(SAMLMessageContext context, DateTime notOnOrAfter, String sessionId) throws
+    public Assertion buildAssertion(AuthenticationContext authenticationContext, DateTime notOnOrAfter, String sessionId) throws
             IdentityException {
 
         try {
-            // TODO
-            // AuthenticationResult authnResult = context.getAuthenticationResult();
+            SAMLMessageContext context = (SAMLMessageContext) authenticationContext.getParameter(SAMLSSOConstants
+                    .SAMLContext);
             DateTime currentTime = new DateTime();
             Assertion samlAssertion = new AssertionBuilder().buildObject();
             SAMLResponseHandlerConfig samlResponseHandlerConfig = context.getResponseHandlerConfig();
@@ -97,7 +98,7 @@ public class DefaultSAMLAssertionBuilder implements SAMLAssertionBuilder {
 
             NameID nameId = new NameIDBuilder().buildObject();
             // TODO
-            nameId.setValue("admin");
+            nameId.setValue(SAMLSSOUtil.getSubject(authenticationContext));
             if (samlResponseHandlerConfig.getNameIdFormat() != null) {
                 nameId.setFormat(samlResponseHandlerConfig.getNameIdFormat());
             } else {
@@ -154,7 +155,7 @@ public class DefaultSAMLAssertionBuilder implements SAMLAssertionBuilder {
                 * If <AttributeConsumingServiceIndex> element is in the <AuthnRequest> and according to
                 * the spec 2.0 the subject MUST be in the assertion
                 */
-            Map<String, String> claims = SAMLSSOUtil.getAttributes(context);
+            Map<String, String> claims = SAMLSSOUtil.getAttributes(authenticationContext);
             if (claims != null && !claims.isEmpty()) {
                 AttributeStatement attrStmt = buildAttributeStatement(claims);
                 if (attrStmt != null) {
