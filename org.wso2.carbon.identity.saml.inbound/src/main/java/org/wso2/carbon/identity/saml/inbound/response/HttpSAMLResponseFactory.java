@@ -55,25 +55,26 @@ public class HttpSAMLResponseFactory extends HttpIdentityResponseFactory {
     @Override
     public HttpIdentityResponse.HttpIdentityResponseBuilder create(IdentityResponse identityResponse) {
 
-        if (identityResponse instanceof SAMLLoginResponse) {
-            return sendResponse(identityResponse);
-        } else {
-            return sendNotification(identityResponse);
-        }
+        HttpIdentityResponse.HttpIdentityResponseBuilder builder = new HttpIdentityResponse.HttpIdentityResponseBuilder();
+        create(builder, identityResponse);
+        return builder;
+//
     }
 
     @Override
-    public HttpIdentityResponse.HttpIdentityResponseBuilder create(HttpIdentityResponse.HttpIdentityResponseBuilder
-                                                                           httpIdentityResponseBuilder,
-                                                                   IdentityResponse
-                                                                           identityResponse) {
-        return create(identityResponse);
+    public void create(HttpIdentityResponse.HttpIdentityResponseBuilder builder,
+                                                                   IdentityResponse identityResponse) {
+        super.create(builder, identityResponse);
+        if (identityResponse instanceof SAMLLoginResponse) {
+            sendResponse(builder, identityResponse);
+        } else {
+            sendNotification(builder, identityResponse);
+        }
     }
 
-    private HttpIdentityResponse.HttpIdentityResponseBuilder sendResponse(IdentityResponse identityResponse) {
+    private void sendResponse(HttpIdentityResponse.HttpIdentityResponseBuilder builder, IdentityResponse
+            identityResponse) {
         SAMLLoginResponse loginResponse = ((SAMLLoginResponse) identityResponse);
-        HttpIdentityResponse.HttpIdentityResponseBuilder builder = new HttpIdentityResponse
-                .HttpIdentityResponseBuilder();
 
         String authenticatedIdPs = loginResponse.getAuthenticatedIdPs();
         String relayState = loginResponse.getRelayState();
@@ -86,7 +87,6 @@ public class HttpSAMLResponseFactory extends HttpIdentityResponseFactory {
             builder.setBody(getPostHtml(acUrl, relayState, authenticatedIdPs, loginResponse));
         }
         builder.setStatusCode(200);
-        return builder;
     }
 
     private String getRedirectHtml(String acUrl, String relayState, String authenticatedIdPs, SAMLLoginResponse
@@ -151,10 +151,9 @@ public class HttpSAMLResponseFactory extends HttpIdentityResponseFactory {
         return out.toString();
     }
 
-    private HttpIdentityResponse.HttpIdentityResponseBuilder sendNotification(IdentityResponse identityResponse) {
+    private void sendNotification(HttpIdentityResponse.HttpIdentityResponseBuilder builder, IdentityResponse
+                                  identityResponse) {
         SAMLErrorResponse errorResponse = ((SAMLErrorResponse) identityResponse);
-        HttpIdentityResponse.HttpIdentityResponseBuilder builder = new HttpIdentityResponse
-                .HttpIdentityResponseBuilder();
         String redirectURL = SAMLSSOUtil.getNotificationEndpoint();
         Map<String, String[]> queryParams = new HashMap();
 
@@ -180,7 +179,6 @@ public class HttpSAMLResponseFactory extends HttpIdentityResponseFactory {
         builder.setStatusCode(302);
         builder.setParameters(queryParams);
         builder.setRedirectURL(redirectURL);
-        return builder;
     }
 
     @Override

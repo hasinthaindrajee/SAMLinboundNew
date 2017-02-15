@@ -106,6 +106,7 @@ abstract public class SAMLResponseHandler extends AbstractResponseHandler {
         builder.setRespString(respString);
         builder.setAcsUrl(messageContext.getAssertionConsumerURL());
         builder.setRelayState(messageContext.getRelayState());
+        addSessionKey(builder, context);
         return respString;
     }
 
