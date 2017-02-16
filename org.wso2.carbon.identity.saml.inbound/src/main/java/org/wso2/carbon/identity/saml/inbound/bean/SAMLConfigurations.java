@@ -1,12 +1,13 @@
 package org.wso2.carbon.identity.saml.inbound.bean;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SAMLConfigurations {
 
-    private String keyStoreLocation = "/media/hasinthaindrajee/204c7dcd-f122-4bc5-9743-f46bcdf78f37/530/wso2is-5.3" +
-            ".0/repository/resources/security/wso2carbon.jks";
+    private String keyStoreLocation = System.getProperty("carbon.home") + File.separator + "security" + File
+            .separator + "wso2carbon.jks";;
     private String keyStoreType = "JKS";
     private String keyStorePassword = "wso2carbon";
     private String keyStoreAlias = "wso2carbon";
@@ -32,6 +33,7 @@ public class SAMLConfigurations {
     private List<String> destinationUrls = new ArrayList<>();
     private static SAMLConfigurations instance = new SAMLConfigurations();
 
+
     public static SAMLConfigurations getInstance() {
         return instance;
     }
@@ -40,6 +42,7 @@ public class SAMLConfigurations {
     private SAMLConfigurations(){
         this.destinationUrls.add("https://localhost:9292/gateway");
     }
+
     public String getKeyStoreLocation() {
         return keyStoreLocation;
     }
