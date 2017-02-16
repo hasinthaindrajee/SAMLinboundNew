@@ -879,9 +879,9 @@ public class SAMLSSOUtil {
     // TODO fix this to get proper subject
     public static String getSubject(AuthenticationContext authenticationContext) {
         if (authenticationContext.getSequenceContext() != null && authenticationContext.getSequenceContext()
-                .getStepContext(0) != null && authenticationContext.getSequenceContext().getStepContext(0).getUser()
+                .getStepContext(1) != null && authenticationContext.getSequenceContext().getStepContext(1).getUser()
                 != null) {
-            return authenticationContext.getSequenceContext().getStepContext(0).getUser().getUserIdentifier();
+            return authenticationContext.getSequenceContext().getStepContext(1).getUser().getUserIdentifier();
         }
         return "testuser";
     }
