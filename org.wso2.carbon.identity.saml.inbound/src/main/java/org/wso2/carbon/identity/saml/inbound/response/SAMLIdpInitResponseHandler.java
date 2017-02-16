@@ -155,7 +155,7 @@ public class SAMLIdpInitResponseHandler extends SAMLResponseHandler {
 
     public boolean canHandle(MessageContext messageContext) {
         if (messageContext instanceof AuthenticationContext) {
-            return ((AuthenticationContext) messageContext).getIdentityRequest() instanceof SAMLIdpInitRequest;
+            return ((AuthenticationContext) messageContext).getInitialAuthenticationRequest() instanceof SAMLIdpInitRequest;
         }
         return false;
     }
