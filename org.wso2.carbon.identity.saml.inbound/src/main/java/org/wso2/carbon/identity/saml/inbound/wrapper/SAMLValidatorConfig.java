@@ -1,11 +1,13 @@
 package org.wso2.carbon.identity.saml.inbound.wrapper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class SAMLValidatorConfig {
+public class SAMLValidatorConfig implements Serializable {
 
+    private static final long serialVersionUID = 1926448600042806841L;
     private Properties properties;
 
     public SAMLValidatorConfig(Properties properties) {
